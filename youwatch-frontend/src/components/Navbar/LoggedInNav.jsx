@@ -11,7 +11,7 @@ const LoggedInNav = ({ onLogout }) => {
   };
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
-
+  console.log(user);
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -53,6 +53,18 @@ const LoggedInNav = ({ onLogout }) => {
             onClick={() => handleRoute("/my-videos")}
           >
             My Videos
+          </li>
+          <li
+            className="cursor-pointer mb-2 hover:bg-gray-700 p-2 rounded"
+            onClick={() => handleRoute("/posts/all")}
+          >
+            Posts
+          </li>
+          <li
+            className="cursor-pointer mb-2 hover:bg-gray-700 p-2 rounded"
+            onClick={() => handleRoute("/posts")}
+          >
+            My Posts
           </li>
           <li
             className="mb-2 hover:bg-gray-700 p-2 rounded cursor-pointer"
@@ -103,7 +115,7 @@ const LoggedInNav = ({ onLogout }) => {
         <SearchBar />
 
         <div className="profile">
-          <Link to="/profile" className="text-white hover:text-blue-200">
+          <Link to="/myprofile" className="text-white hover:text-blue-200">
             <div className="w-12 h-12">
               <img
                 src={`${user?.avatar}`}

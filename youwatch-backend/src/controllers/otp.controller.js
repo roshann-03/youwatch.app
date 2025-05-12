@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import generateAccessAndRefereshTokens from "../utils/generateAccessRefreshToken.js";
 
 let otpStore = {}; // Store OTPs temporarily
 
@@ -102,9 +103,17 @@ export const verifyOTP = asyncHandler(async (req, res) => {
         .status(500)
         .json(new ApiError(500, "Error fetching the created user"));
     }
-
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
+      newUser._id
+    );
+    const options = {
+      httpOnly: true,
+      secure: true, // Set to false if not using HTTPS during development
+    };
     return res
       .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
       .json(new ApiResponse(200, createdUser, "OTP verified"));
   } else {
     return res.status(400).json(new ApiError(400, "Invalid OTP"));

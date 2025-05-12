@@ -1,107 +1,71 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import { Link } from "react-router-dom"; // Import Link
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Link, useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState(1); // 1: Request OTP, 2: Verify OTP
-
-  const notify = (message) => toast(message);
-
-  const handleRequestOtp = async (e) => {
+  const [loading, setLoading] = useState(false); // Add loading state
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email) {
-      notify("Please enter your email address");
-      return;
-    }
+    if (!email) return toast.error("Please enter your email");
 
     try {
-      await axios.post("http://localhost:5000/api/request-otp", { email });
-      notify("OTP sent to your email. Please check your inbox.");
-      setStep(2);
-    } catch (error) {
-      notify("Failed to send OTP. Please try again.");
-    }
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-
-    if (!otp) {
-      notify("Please enter the OTP sent to your email");
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/verify-otp`,
-        { email, otp }
+      setLoading(true); // Start loading
+      await axios.post(
+        "http://localhost:8000/api/v1/users/forgot-password",
+        {
+          email,
+        },
+        { withCredentials: true }
       );
 
-      if (response.status === 200) {
-        notify("OTP verified! You can now reset your password.");
-        // Redirect to reset password page or show reset password form
-      }
+      toast.success("Reset link sent to your email");
+      setEmail("");
+      navigate("/login");
     } catch (error) {
-      notify("Invalid OTP. Please try again.");
+      console.log(error);
+      toast.error(
+        error?.response?.data?.message || "Failed to send reset email"
+      );
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   return (
     <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-500 to-teal-500">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-        <h2 className="mb-6 text-2xl font-bold text-center text-gray-700">
-          {step === 1 ? "Forgot Password" : "Verify OTP"}
+      <div className="bg-white p-8 rounded-lg shadow-md w-96">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">
+          Forgot Password
         </h2>
-        {step === 1 ? (
-          <form onSubmit={handleRequestOtp}>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="border border-gray-300 p-3 mb-4 w-full rounded"
-              required
-            />
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition duration-200"
-            >
-              Request OTP
-            </button>
-            <p className="mt-4 text-sm text-center">
-              <Link to="/login" className="text-blue-600 hover:underline">
-                Back to Login
-              </Link>
-            </p>
-          </form>
-        ) : (
-          <form onSubmit={handleVerifyOtp}>
-            <input
-              type="text"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="border border-gray-300 p-3 mb-4 w-full rounded"
-              required
-            />
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition duration-200"
-            >
-              Verify OTP
-            </button>
-            <p className="mt-4 text-sm text-center">
-              <Link to="/login" className="text-blue-600 hover:underline">
-                Login here
-              </Link>
-            </p>
-          </form>
-        )}
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="w-full p-3 mb-4 border rounded"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <button
+            type="submit"
+            className={`w-full text-white p-3 rounded transition duration-200 ${
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+            disabled={loading}
+          >
+            {loading ? "Sending..." : "Send Reset Link"}
+          </button>
+        </form>
+        <Link to="/login" className="flex justify-end pt-2 text-blue-800">
+          Back to login
+        </Link>
         <ToastContainer />
       </div>
     </div>

@@ -45,6 +45,7 @@ const OtpVerification = ({ onLogin }) => {
       } else if (response.status === 200) {
         onLogin(true);
         notify("OTP verified successfully!");
+        localStorage.setItem("user", JSON.stringify(response.data.data));
         setOtp("");
         navigate("/");
         setLoading(false);

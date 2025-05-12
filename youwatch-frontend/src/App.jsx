@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Routes,
-  Route,
-  Navigate,
-  useNavigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Auth/Login";
 import UploadVideo from "./components/Videos/UploadVideo";
@@ -21,6 +16,10 @@ import Profile from "./components/User/Profile";
 import MyVideos from "./components/User/MyVideos";
 import VideoUpdateForm from "./components/Videos/UpdateVideoForm";
 import SubscribedChannels from "./components/User/SubscribedChannels";
+import Home from "./tweetapp/pages/Home";
+import AllTweets from "./tweetapp/components/AllTweets";
+import ResetPassword from "./components/Auth/ResetPassword";
+import MyProfile from "./components/User/MyProfile";
 
 const API_URL = "http://localhost:8000/api/v1";
 
@@ -106,10 +105,14 @@ const App = () => {
         <Route path="/video/:id" element={<VideoDetail />} />
         <Route path="/channel/:username" element={<ChannelMenu />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/myprofile" element={<MyProfile />} />
         <Route path="/my-videos" element={<MyVideos />} />
         <Route path="/update-video" element={<VideoUpdateForm />} />
         <Route path="/subscribed-channels" element={<SubscribedChannels />} />
+        <Route path="/posts" element={<Home />} />
+        <Route path="/posts/all" element={<AllTweets />} />
       </Routes>
     </div>
   );

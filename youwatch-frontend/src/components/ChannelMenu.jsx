@@ -8,33 +8,59 @@ const ChannelMenu = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [subscriberCount, setSubscriberCount] = useState(0);
+  const [isSubscribed, setIsSubscribed] = useState(false); // Track subscription status
+  const [currentUser, setCurrentUser] = useState(null);
+
   const { username } = useParams();
   const navigate = useNavigate();
   const API_URL = "http://localhost:8000/api/v1";
 
+  // Function to fetch channel details
+  const fetchChannelDetails = async () => {
+    try {
+      const [channelResponse, currentUserResponse] = await Promise.all([
+        axios.get(`${API_URL}/users/c/${username}`, { withCredentials: true }),
+        axios.get(`${API_URL}/users/current-user`, { withCredentials: true }),
+      ]);
+
+      const channelData = channelResponse.data.data;
+      setChannel(channelData);
+      setSubscriberCount(channelData.subscribersCount);
+      setIsSubscribed(channelData.isSubscribed);
+      setCurrentUser(currentUserResponse.data.data);
+
+      const videosResponse = await axios.get(
+        `${API_URL}/videos/c/${channelData._id}`,
+        { withCredentials: true }
+      );
+      setVideos(videosResponse.data.data);
+    } catch (err) {
+      setError("Failed to fetch channel details or videos");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Effect to fetch channel details on username change
   useEffect(() => {
-    const fetchChannelDetails = async () => {
-      try {
-        const channelResponse = await axios.get(
-          `${API_URL}/users/c/${username}`,
-          { withCredentials: true }
-        );
-
-        setChannel(channelResponse.data.data);
-
-        const videosResponse = await axios.get(
-          `${API_URL}/videos/c/${channelResponse.data.data._id}`,
-          { withCredentials: true }
-        );
-        setVideos(videosResponse.data.data);
-      } catch (err) {
-        setError("Failed to fetch channel details or videos");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchChannelDetails();
   }, [username]);
+
+  // Handle subscribe/unsubscribe actions
+  const handleSubscribe = async () => {
+    try {
+      await axios.post(
+        `${API_URL}/subscriptions/c/${channel?._id}`,
+        {},
+        { withCredentials: true }
+      );
+      setIsSubscribed(!isSubscribed); // Toggle subscription status
+      fetchChannelDetails(); // Re-fetch to update the subscriber count
+    } catch (err) {
+      console.error("Error toggling subscription", err);
+    }
+  };
 
   if (loading) return <div className="text-center">Loading...</div>;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
@@ -43,7 +69,7 @@ const ChannelMenu = () => {
   return (
     <div className="max-w-7xl mx-auto p-5 bg-white rounded-lg shadow-md">
       {/* Channel Details */}
-      <div className="mb-6 border border-gray-800 flex flex-col justify-between gap-5">
+      <div className="mb-6 border border-gray-800 flex flex-col gap-5">
         <div className="w-full h-44">
           <img
             src={channel?.coverImage}
@@ -52,19 +78,32 @@ const ChannelMenu = () => {
           />
         </div>
 
-        <div className="flex flex-col justify-between">
-          <div className="ml-4 flex items-center gap-4">
-            <img
-              src={channel.avatar || channel?.snippet.thumbnails.high.url}
-              alt={channel.username}
-              className="w-32 h-32 rounded-full border-4 border-white shadow-md"
-            />
-            <div>
-              <h2 className="text-3xl font-bold">{channel?.username}</h2>
-              <p className="mt-2 text-gray-700">{channel?.fullName}</p>
-            </div>
-            <Subscription channelId={channel?._id} />
+        <div className="ml-4 flex items-center gap-4">
+          <img
+            src={channel.avatar || channel?.snippet?.thumbnails?.high?.url}
+            alt={channel.username}
+            className="w-32 h-32 rounded-full border-4 border-white shadow-md"
+          />
+          <div>
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              @{channel?.username}
+              <span className="text-xl font-medium text-gray-500">
+                • {subscriberCount} subscriber{subscriberCount !== 1 && "s"}
+              </span>
+            </h2>
+            <p className="mt-1 text-gray-700">{channel?.fullName}</p>
           </div>
+
+          {currentUser?._id !== channel?._id && (
+            <button
+              onClick={handleSubscribe}
+              className={`py-2 px-4 rounded-full text-white ${
+                isSubscribed ? "bg-red-500" : "bg-blue-500"
+              }`}
+            >
+              {isSubscribed ? "Unsubscribe" : "Subscribe"}
+            </button>
+          )}
         </div>
       </div>
 

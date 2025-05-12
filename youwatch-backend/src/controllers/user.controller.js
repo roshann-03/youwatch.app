@@ -5,43 +5,37 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import generateAccessAndRefereshTokens from "../utils/generateAccessRefreshToken.js";
+import crypto from "crypto";
+import { sendEmail } from "../utils/sendEmail.js";
 
-const generateAccessAndRefereshTokens = async (userId) => {
-  try {
-    const user = await User.findById(userId);
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
+// Generate access and refresh tokens
 
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
-
-    return { accessToken, refreshToken };
-  } catch (error) {
-    throw new ApiError(
-      500,
-      "Something went wrong while generating referesh and access token"
-    );
-  }
-};
-
+//Register route using post request
 const registerUser = asyncHandler(async (req, res) => {
+  //get user information
   const { fullName, email, username, password } = req.body;
+  //Small checking if the information is blank
   if (
     [fullName, email, username, password].some((field) => field?.trim() === "")
   ) {
+    // If the information is blank return error
     return res.status(400).json(new ApiError(400, "All fields are required"));
   }
 
+  //Check If the user already exists
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
 
+  //If the user already exists return error
   if (existedUser) {
     return res
       .status(409)
       .json(new ApiError(409, "User with email or username already exists"));
   }
 
+  //Upload avatar and cover image
   const avatarLocalPath = req.files?.avatar[0]?.path;
   //const coverImageLocalPath = req.files?.coverImage[0]?.path;
   let coverImageLocalPath;
@@ -53,6 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
     coverImageLocalPath = req.files.coverImage[0].path;
   }
 
+  //If the file is not given by user
   if (!avatarLocalPath) {
     return res
       .status(400)
@@ -60,11 +55,13 @@ const registerUser = asyncHandler(async (req, res) => {
         new ApiError(400, "avatarLocalPath Error: Avatar file is required")
       );
   }
+  //Upload avatar and cover image on cloudinary cloud storage
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
   if (!avatar) {
     return res.status(400).json(new ApiError(400, "Avatar file is required"));
   }
+
   const user = {
     fullName,
     avatar: avatar.url,
@@ -74,6 +71,7 @@ const registerUser = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
   };
 
+  //Create a new user
   return res
     .status(200)
     .json(new ApiResponse(200, user, "User went for otp verification"));
@@ -127,7 +125,7 @@ const loginUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: true, // Set to false if not using HTTPS during development
   };
-
+  
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
@@ -244,9 +242,8 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-  const { fullName, email } = req.body;
-
-  if (!fullName || !email) {
+  const { username, fullName, email } = req.body;
+  if (!username || !fullName || !email) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -254,6 +251,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     req.user?._id,
     {
       $set: {
+        username,
         fullName,
         email: email,
       },
@@ -451,6 +449,113 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     );
 });
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new ApiError(400, "Email is required");
+  }
+
+  // Check if user exists
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(404, "User with this email does not exist");
+  }
+  // Generate reset token
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Save to user model
+  user.resetPasswordToken = hashedToken;
+  user.resetPasswordExpiry = Date.now() + 1000 * 60 * 30; // 30 minutes
+
+  await user.save({ validateBeforeSave: false });
+
+  // Prepare reset link
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+  const message = `Hello ${user.username || "user"},\n\nYou requested a password reset.\nClick the link below to reset your password:\n\n${resetUrl}\n\nThis link will expire in 30 minutes.\n\nIf you didn't request this, please ignore this email.`;
+
+  try {
+    // Send email
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset Request",
+      text: message,
+    });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Password reset link sent to your email"));
+  } catch (error) {
+    // Cleanup token fields if sending fails
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiry = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    throw new ApiError(500, "Failed to send reset email. Try again later.");
+  }
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpiry: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new ApiError(400, "Invalid or expired token");
+  }
+
+  user.password = newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpiry = undefined;
+
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password reset successfully"));
+});
+
+const deleteUserAccount = async (req, res) => {
+  try {
+    const userId = req.user._id; // Get user ID from JWT payload (assuming it's added to the request by the middleware)
+
+    // Find user by ID and delete it
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+    res
+      .status(200)
+      .clearCookie("accessToken", options)
+      .clearCookie("refreshToken", options);
+    req.user = null;
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+    // Send success response
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "Account deleted successfully"));
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(error.status || 500)
+      .json(new ApiResponse(error.status || 500, null, error.message));
+  }
+};
+
 export {
   registerUser,
   loginUser,
@@ -463,4 +568,7 @@ export {
   updateUserCoverImage,
   getUserChannelProfile,
   getWatchHistory,
+  forgotPassword,
+  resetPassword,
+  deleteUserAccount,
 };

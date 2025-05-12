@@ -111,6 +111,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
   try {
     const { channelId } = req.params;
     // TODO: toggle subscription
+    console.log(channelId);
     if (!channelId) {
       return res.status(400).json(new ApiError(400, "channelId required"));
     }
@@ -130,6 +131,8 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
       subscriber: req.user._id,
       channel: channelId,
     }).populate("subscriber");
+
+    console.log(subscribers);
 
     return res
       .status(200)
@@ -164,7 +167,6 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
       subscriber: req.user._id,
       channel: channelId,
     }).populate("channel");
-
     return res
       .status(200)
       .json(

@@ -11,24 +11,36 @@ import {
   getUserChannelProfile,
   getWatchHistory,
   updateAccountDetails,
+  resetPassword,
+  forgotPassword,
+  deleteUserAccount,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-const router = Router();
+const router = Router(); //make an instance of Router();
 
+//Register route using post request
 router.route("/register").post(
+  //using multer for file/images upload
+  //uploading 2 images avatar and cover image
+  //using upload middleware and fields
   upload.fields([
     {
+      //image name
       name: "avatar",
+      //max image
       maxCount: 1,
     },
     {
+      //image name
       name: "coverImage",
+      //max image
       maxCount: 1,
     },
   ]),
+  //registerUser controller
   registerUser
 );
 
@@ -47,6 +59,8 @@ router.get("/status", (req, res) => {
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/change-password").post(verifyJWT, changeCurrentPassword);
+router.route("/forgot-password").post(forgotPassword);
+router.route("/reset-password/:token").post(resetPassword);
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/update-account").patch(verifyJWT, updateAccountDetails);
 
@@ -59,5 +73,7 @@ router
 
 router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
 router.route("/history").get(verifyJWT, getWatchHistory);
+
+router.delete("/delete-account", verifyJWT, deleteUserAccount);
 
 export default router;

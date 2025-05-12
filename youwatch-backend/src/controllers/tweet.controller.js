@@ -103,4 +103,14 @@ const deleteTweet = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, deletedTweet, "Tweet deleted"));
 });
 
-export { createTweet, getUserTweets, updateTweet, deleteTweet };
+const getAllTweets = asyncHandler(async (req, res) => {
+  const tweets = await Tweet.find({}).populate("owner").sort({ createdAt: -1 });
+  if (!tweets || tweets.length === 0) {
+    return res.status(404).json(new ApiError(404, "No tweets found"));
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, tweets, "All tweets fetched"));
+});
+
+export { createTweet, getUserTweets, updateTweet, deleteTweet, getAllTweets };
