@@ -129,6 +129,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true, // Set to false if not using HTTPS during development
+    sameSite: "None",
   };
 
   return res
@@ -164,6 +165,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
+    sameSite: "None",
   };
 
   return res
@@ -548,6 +550,7 @@ const deleteUserAccount = async (req, res) => {
     const options = {
       httpOnly: true,
       secure: true,
+      sameSite: "None",
     };
     res
       .status(200)

@@ -130,7 +130,8 @@ export const verifyOTP = asyncHandler(async (req, res) => {
     );
     const options = {
       httpOnly: true,
-      secure: true, // Set to false if not using HTTPS during development
+      secure: true,
+      sameSite: "None", // Set to false if not using HTTPS during development
     };
     return res
       .status(200)

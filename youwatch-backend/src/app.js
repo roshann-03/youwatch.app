@@ -13,7 +13,7 @@ app.use(
   cors({
     origin: process.env.CORS_ORIGIN || "https://youwatch-api.onrender.com",
     credentials: true,
-    // sameSite: "None",
+    sameSite: "None",
   })
 );
 

@@ -46,7 +46,7 @@ const ForgotPassword = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="peer h-12 w-full rounded-md border border-gray-600 bg-transparent px-3 pt-4 text-white placeholder-transparent focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all"
+              className="peer h-12 w-full rounded-md border border-gray-600 bg-transparent px-3 pt-4 text-black dark:text-white placeholder-transparent focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all"
               placeholder="Enter your email"
             />
             <label
