@@ -21,10 +21,9 @@ import AllTweets from "./tweetapp/components/AllTweets";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import MyProfile from "./pages/User/MyProfile";
 import OAuthSuccess from "./pages/OAuthSuccess";
-
+import NotFoundPage from "./pages/NotFoundPage";
 import "./index.css";
 import LoadingSpinner from "./components/LoadingSpinner";
-import Footer from "./components/Footer";
 
 // PrivateRoute to protect routes
 const PrivateRoute = ({ isAuthenticated, children }) => {
@@ -207,6 +206,8 @@ const App = () => {
           path="/oauth-success"
           element={<OAuthSuccess onLogin={handleLogin} />}
         />
+
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>
   );
