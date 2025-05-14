@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "start": "pm2 start src/index.js --name 'youwatch-backend' --env production"
+    "start": "node src/index.js"
   },
   "keywords": [
     "javascript",
