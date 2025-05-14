@@ -8,7 +8,7 @@ import passport from "passport";
 import morgan from "morgan";
 
 const app = express();
-app.use(morgan("dev"));
+app.use(morgan("combined"));
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || "http://localhost:5173",
@@ -41,7 +41,6 @@ import searchRouter from "./routes/search.routes.js";
 //routes declaration
 
 //user routes
-app.use("/api/v1/users", userRouter);
 // app.use("/auth", authRoutes);
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/tweets", tweetRouter);

@@ -25,7 +25,7 @@ const GoogleLoginButton = () => {
         toast.error("Failed to login with Google. Please try again!");
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message);
     }
   };
 
