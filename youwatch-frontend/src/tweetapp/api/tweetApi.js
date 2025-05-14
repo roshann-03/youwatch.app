@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:8000/api/v1/tweets",
+  baseURL: `${import.meta.env.VITE_APP_API_URL}/tweets`,
   withCredentials: true, // to send cookies (JWT)
 });
 

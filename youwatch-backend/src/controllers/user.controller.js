@@ -27,12 +27,16 @@ const registerUser = asyncHandler(async (req, res) => {
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
-
   //If the user already exists return error
-  if (existedUser) {
+  if (existedUser && !existedUser?.isGoogleUser) {
     return res
       .status(409)
       .json(new ApiError(409, "User with email or username already exists"));
+  }
+  if (existedUser?.isGoogleUser) {
+    return res
+      .status(400)
+      .json(new ApiError(400, "Please log in using Google for this account."));
   }
 
   //Upload avatar and cover image
@@ -78,7 +82,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { emailOrUsername, email, username, password } = req.body;
+  const { emailOrUsername, password } = req.body;
   // Ensure at least one identifier is provided
   if (!emailOrUsername) {
     return res
@@ -99,10 +103,11 @@ const loginUser = asyncHandler(async (req, res) => {
     ],
   });
 
-  if (!user) {
+  if (user?.isGoogleUser) {
+    throw new ApiError(404, "Please log in using Google for this account.");
+  } else if (!user) {
     throw new ApiError(404, "User does not exist");
   }
-
   // Validate password
   const isPasswordValid = await user.isPasswordCorrect(password);
 
@@ -125,7 +130,7 @@ const loginUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: true, // Set to false if not using HTTPS during development
   };
-  
+
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
@@ -221,6 +226,16 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
   const user = await User.findById(req.user?._id);
+  if (user?.isGoogleUser) {
+    return res
+      .status(400)
+      .json(
+        new ApiError(
+          400,
+          "You have used google account to signup can't change the password"
+        )
+      );
+  }
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
   if (!isPasswordCorrect) {
@@ -258,7 +273,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     },
     { new: true }
   ).select("-password");
-
+  req.user = user;
   return res
     .status(200)
     .json(new ApiResponse(200, user, "Account details updated successfully"));

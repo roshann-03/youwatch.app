@@ -110,8 +110,7 @@ const isSubscribing = asyncHandler(async (req, res) => {
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
   try {
     const { channelId } = req.params;
-    // TODO: toggle subscription
-    console.log(channelId);
+
     if (!channelId) {
       return res.status(400).json(new ApiError(400, "channelId required"));
     }
@@ -122,17 +121,14 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
       return res.status(401).json(new ApiError(401, "User is Unauthorized"));
     }
 
-    const channelExists = await Subscription.exists({ _id: channelId });
+    const channelExists = await User.exists({ _id: channelId });
     if (!channelExists) {
       return res.status(404).json(new ApiError(404, "Channel not found"));
     }
 
     const subscribers = await Subscription.find({
-      subscriber: req.user._id,
       channel: channelId,
-    }).populate("subscriber");
-
-    console.log(subscribers);
+    }).populate("subscriber", "-password -refreshToken");
 
     return res
       .status(200)
@@ -144,7 +140,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     return res
       .status(500)
       .json(
-        new ApiError(500, "Internal Sever Error while fetching subscribers")
+        new ApiError(500, "Internal Server Error while fetching subscribers")
       );
   }
 });

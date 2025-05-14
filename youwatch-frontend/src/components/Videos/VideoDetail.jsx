@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import VideoList from "./VideoList";
 import CommentSection from "../CommentSection";
 import Subscription from "../User/Subscription";
 import { BiLike, BiDislike } from "react-icons/bi";
 import { BiSolidLike, BiSolidDislike } from "react-icons/bi";
+import { axiosJSON } from "../../api/axiosInstances";
 
 const VideoDetail = () => {
   const { id } = useParams();
@@ -19,11 +19,9 @@ const VideoDetail = () => {
   const [likesCount, setLikesCount] = useState(0);
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const API_URL = `http://localhost:8000/api/v1/likes`;
-
   const handleLikedStatus = async (videoId) => {
     try {
-      const response = await axios.get(`${API_URL}/videos`, {
+      const response = await axiosJSON.get(`likes/videos`, {
         withCredentials: true,
       });
       if (response?.data?.data?.length > 0) {
@@ -53,10 +51,7 @@ const VideoDetail = () => {
 
   const fetchVideoLikes = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8000/api/v1/videos/likes/${id}`,
-        { withCredentials: true }
-      );
+      const response = await axiosJSON.get(`/videos/likes/${id}`);
       setLikesCount(response?.data.data.likes);
     } catch (error) {
       console.error("Error fetching video likes:", error);
@@ -69,13 +64,7 @@ const VideoDetail = () => {
 
   const toggleLike = async (videoId) => {
     try {
-      const response = await axios.post(
-        `${API_URL}/toggle/v/${videoId}`,
-        null,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axiosJSON.post(`likes/toggle/v/${videoId}`);
 
       fetchVideoLikes();
 
@@ -128,10 +117,7 @@ const VideoDetail = () => {
   useEffect(() => {
     const fetchVideoDetails = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/api/v1/videos/${id}`,
-          { withCredentials: true }
-        );
+        const response = await axiosJSON.get(`videos/${id}`);
         setVideo(response?.data.data);
       } catch (err) {
         console.error("Error fetching video details:", err);

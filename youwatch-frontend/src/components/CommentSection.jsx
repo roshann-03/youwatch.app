@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import { BiLike, BiSolidLike } from "react-icons/bi";
+import { axiosJSON } from "../api/axiosInstances";
 
 const CommentSection = () => {
   const [comment, setComment] = useState("");
@@ -12,13 +12,12 @@ const CommentSection = () => {
   const { id } = useParams();
   const user = JSON.parse(localStorage.getItem("user"));
   const [hasNextPage, setHasNextPage] = useState(null);
-  const API_URL = "http://localhost:8000/api/v1/comments"; // Update to your API endpoint
 
   const fetchComments = async (currentPage) => {
     try {
-      const response = await axios.get(`${API_URL}/${id}?page=${currentPage}`, {
-        withCredentials: true,
-      });
+      const response = await axiosJSON.get(
+        `/comments/${id}?page=${currentPage}`
+      );
       const newComments = response.data.data.docs.sort(
         () => Math.random() - 0.5
       );
@@ -41,9 +40,7 @@ const CommentSection = () => {
     const newComment = { content: comment };
 
     try {
-      const response = await axios.post(`${API_URL}/${id}`, newComment, {
-        withCredentials: true,
-      });
+      const response = await axiosJSON.post(`/comments/${id}`, newComment);
       setComments((prevComments) => [
         ...prevComments,
         { ...response.data.data, isLiked: false },
@@ -97,10 +94,9 @@ const CommentSection = () => {
     const updatedComment = { content: editingCommentContent };
 
     try {
-      const response = await axios.patch(
-        `${API_URL}/c/${videoId}/${commentId}`,
-        updatedComment,
-        { withCredentials: true }
+      const response = await axiosJSON.patch(
+        `/comments/c/${videoId}/${commentId}`,
+        updatedComment
       );
       setComments((prevComments) =>
         prevComments.map((c) => (c._id === commentId ? response.data.data : c))
@@ -114,9 +110,7 @@ const CommentSection = () => {
 
   const handleDeleteComment = async (videoId, commentId) => {
     try {
-      await axios.delete(`${API_URL}/c/${videoId}/${commentId}`, {
-        withCredentials: true,
-      });
+      await axiosJSON.delete(`/comments/c/${videoId}/${commentId}`);
       setComments((prevComments) =>
         prevComments.filter((c) => c._id !== commentId)
       );
@@ -127,14 +121,13 @@ const CommentSection = () => {
 
   const toggleLikeComment = async (commentId) => {
     try {
-      const response = await axios.post(
-        `http://localhost:8000/api/v1/likes/toggle/c/${commentId}`,
+      const response = await axiosJSON.post(
+        `/likes/toggle/c/${commentId}`,
         {},
         { withCredentials: true }
       );
 
       const isLiked = response.data.data.isLiked; // Assuming this is the response structure
-      console.log(isLiked);
       // Update the comments state to reflect the new like status
       setComments((prevComments) =>
         prevComments.map(
@@ -146,10 +139,8 @@ const CommentSection = () => {
     }
   };
   useEffect(() => {
-    const isLikedOnComment = () => {
-      
-    }
-  })
+    const isLikedOnComment = () => {};
+  });
   const [showOptions, setShowOptions] = useState(null); // Track which comment's options to show
 
   const toggleOptions = (commentId) => {

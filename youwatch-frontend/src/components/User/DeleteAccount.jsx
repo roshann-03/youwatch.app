@@ -1,7 +1,5 @@
 // DeleteAccount.jsx
-import React from "react";
-// import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { axiosJSON } from "../../api/axiosInstances";
 import { useAuth } from "../../ContextAPI/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 const DeleteAccount = () => {
@@ -10,17 +8,7 @@ const DeleteAccount = () => {
   const navigate = useNavigate();
   const handleDelete = async () => {
     try {
-      const response = await axios.delete(
-        "http://localhost:8000/api/v1/users/delete-account",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            // Uncomment below line if token is needed
-            // 'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          withCredentials: true, // ✅ this is correct
-        }
-      );
+      const response = await axiosJSON.delete("/users/delete-account");
 
       const data = await response.data;
 

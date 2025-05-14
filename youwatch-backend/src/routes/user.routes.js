@@ -18,6 +18,7 @@ import {
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { googleAuthController } from "../controllers/googleauth.controller.js";
 
 const router = Router(); //make an instance of Router();
 
@@ -63,6 +64,7 @@ router.route("/forgot-password").post(forgotPassword);
 router.route("/reset-password/:token").post(resetPassword);
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/update-account").patch(verifyJWT, updateAccountDetails);
+router.route("/auth/google-auth").post(googleAuthController);
 
 router
   .route("/avatar")

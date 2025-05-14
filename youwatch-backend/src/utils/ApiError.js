@@ -5,18 +5,26 @@ class ApiError extends Error {
     errors = [],
     stack = ""
   ) {
-    super(message); // Set the message of the error
+    super(message);
     this.statusCode = statusCode;
     this.success = false;
     this.errors = errors || [];
-    this.message = message || "Something went wrong"; // Default message if not provided
+    this.message = message || "Something went wrong";
 
-    // Only capture the stack trace if it's not already passed in (for debugging purposes)
     if (stack) {
       this.stack = stack;
     } else {
       Error.captureStackTrace(this, this.constructor);
     }
+  }
+
+  toJSON() {
+    return {
+      success: this.success,
+      statusCode: this.statusCode,
+      message: this.message,
+      errors: this.errors,
+    };
   }
 }
 

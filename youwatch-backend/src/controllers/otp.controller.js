@@ -32,8 +32,29 @@ export const sendOTP = asyncHandler(async (req, res) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
-    subject: "Your OTP Code",
-    text: `Your OTP code is ${otp}. It is valid only for 5 minutes. Do not share this code with anyone.`,
+    subject: "Your One-Time Password (OTP) for YouWatch",
+    html: `
+    <div style="font-family: Arial, sans-serif; color: #333; padding: 20px;">
+      <h2 style="color: #1A73E8;">Hello,</h2>
+      <p style="font-size: 16px;">We’ve received a request to verify your identity with a One-Time Password (OTP) for YouWatch. Please use the following code to proceed:</p>
+      
+      <div style="background-color: #F4F7FB; padding: 20px; border-radius: 8px; text-align: center;">
+        <h3 style="color: #1A73E8; font-size: 36px; margin: 0;">${otp}</h3>
+        <p style="font-size: 16px; margin-top: 10px;">This code is valid for 5 minutes only.</p>
+      </div>
+
+      <p style="font-size: 16px;">Please note: <strong>Never share this OTP with anyone</strong>. If you did not request this OTP, please ignore this email.</p>
+      
+      <p style="font-size: 16px;">If you have any questions, feel free to reach out to our support team.</p>
+
+      <p style="font-size: 16px;">Best regards, <br/> The YouWatch Team</p>
+
+      <footer style="margin-top: 20px; font-size: 12px; color: #888;">
+        <p>YouWatch, Inc. | 1234 Street Name, City, Country</p>
+        <p><a href="https://www.youwatch.com/privacy" style="color: #1A73E8;">Privacy Policy</a> | <a href="https://www.youwatch.com/terms" style="color: #1A73E8;">Terms of Service</a></p>
+      </footer>
+    </div>
+  `,
   };
 
   try {
@@ -86,6 +107,7 @@ export const verifyOTP = asyncHandler(async (req, res) => {
       email: user.email,
       password: user.password,
       username: user.username,
+      isGoogleUser: false,
     });
 
     if (!newUser) {

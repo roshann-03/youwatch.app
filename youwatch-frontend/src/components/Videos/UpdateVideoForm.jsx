@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
+import { axiosFormData } from "../../api/axiosInstances";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -28,16 +28,7 @@ const VideoUpdateForm = () => {
 
     try {
       setLoading(true);
-      await axios.patch(
-        `http://localhost:8000/api/v1/videos/${video?._id}`,
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      await axiosFormData.patch(`/videos/${video?._id}`, formData);
       setLoading(false);
       notify("Video updated successfully");
       event.target.reset();

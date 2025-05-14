@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-const VideoCard = ({ video, isOptions = false }) => {
+import { toast } from "react-toastify";
+import { axiosJSON } from "../../api/axiosInstances";
+import DeleteModal from "../Modals/DeleteModal";
+
+const VideoCard = ({ video, isOptions = false, onDeleteSuccess }) => {
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
+  const [videoToDelete, setVideoToDelete] = useState(null); // Video to delete
+  const [openOptionsId, setOpenOptionsId] = useState(null); // Track which video's options are open
+
+  const optionsRef = useRef(null); // Reference for options button
+
   const notify = (message) => toast(message);
-  const [showOptions, setShowOptions] = useState(false);
+
+  // Format the time into a more readable format
   const timeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -45,108 +54,178 @@ const VideoCard = ({ video, isOptions = false }) => {
       return title;
     }
   };
+
   const handleOptions = (e) => {
     e.stopPropagation();
-    if (e.target.id === video?._id) {
-      setShowOptions(!showOptions);
+    // Open options for the clicked video only
+    if (openOptionsId === video?._id) {
+      setOpenOptionsId(null); // Close options if already open
+    } else {
+      setOpenOptionsId(video?._id); // Open options for the clicked video
     }
   };
-  const handleVideoDelete = async () => {
-    await axios.delete(`http://localhost:8000/api/v1/videos/${video?._id}`, {
-      withCredentials: true,
-    });
-    setShowOptions(false);
-    notify("Video deleted successfully");
-    window.location.reload();
+
+  const handleDeleteClick = (video) => {
+    setVideoToDelete(video); // Set video to be deleted
+    setIsModalOpen(true); // Show modal
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      // Call API to delete video
+      await axiosJSON.delete(`/videos/${videoToDelete._id}`);
+      notify("Video deleted successfully");
+      // Close modal after deletion
+      setIsModalOpen(false);
+      // Trigger parent component's delete success handler
+      if (onDeleteSuccess) {
+        onDeleteSuccess(videoToDelete._id);
+      }
+    } catch (error) {
+      console.error("Error deleting video", error);
+      notify("Failed to delete video");
+    }
   };
 
   const handleVideoUpdate = (video) => {
     navigate(`/update-video`, { state: { video } });
-    setShowOptions(false);
+    setOpenOptionsId(null); // Close options after update
     notify("Video updated successfully");
   };
 
-  return (
-    <div
-      className="video-card flex flex-col bg-black shadow-sm overflow-hidden cursor-pointer w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3 p-2"
-      onClick={handleClick}
-    >
-      <div className="relative">
-        <img
-          className="w-full h-44 object-cover rounded-xl"
-          src={video?.thumbnail}
-          alt={video?.title}
-        />
-        <h3 className="font-medium text-sm absolute bottom-1 right-1 text-white bg-black bg-opacity-65 px-2 rounded">
-          {Math.floor(video?.duration / 60)}:
-          {String(Math.floor(video?.duration % 60)).padStart(2, "0")}
-        </h3>
-      </div>
+  // Close options when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (optionsRef.current && !optionsRef.current.contains(e.target)) {
+        setOpenOptionsId(null); // Close options if click is outside
+      }
+    };
 
-      <div className="flex items-start gap-2 p-1">
-        <div className="w-12 h-12 rounded-full overflow-hidden">
-          {video?.owner.avatar && (
-            <img
-              src={video.owner.avatar}
-              alt={`${video.owner.name}'s avatar`}
-              className="w-full h-full object-cover"
-            />
-          )}
-        </div>
-        <div className="flex-1 relative">
-          <h3 className="font-medium text-gray-50 break-words">
-            {videoTitleTruncate(video?.title)}
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div>
+      <div
+        className="video-card shadow-lg  flex flex-col w-full rounded-xl cursor-pointer transition-all duration-300"
+        onClick={handleClick}
+      >
+        <div className="relative dark:text-white">
+          <img
+            className="w-full h-44 object-cover rounded-xl"
+            src={video?.thumbnail}
+            alt={video?.title}
+          />
+          <h3 className="font-medium text-sm absolute bottom-1 right-1 text-white bg-black bg-opacity-65 px-2 rounded">
+            {Math.floor(video?.duration / 60)}:
+            {String(Math.floor(video?.duration % 60)).padStart(2, "0")}
           </h3>
-          <p className="text-gray-300 ">
-            {video?.owner?.name || video?.owner?.username}
-          </p>
-          <p className="text-[#ababab]  text-sm font-medium">
-            {video?.views} views • {timeAgo(video?.createdAt)}
-          </p>
-          {isOptions && (
-            <div
-              onClick={(e) => {
-                handleOptions(e);
-              }}
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-300"
-            >
-              <svg
-                id={video?._id}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
+        </div>
+
+        <div className="flex items-start gap-2 p-2">
+          <div className="w-12 h-12 rounded-full overflow-hidden">
+            {video?.owner.avatar && (
+              <img
+                src={video.owner.avatar}
+                alt={`${video.owner.name}'s avatar`}
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
+          <div className="flex-1 relative">
+            <h3 className="font-medium break-words dark:text-white">
+              {videoTitleTruncate(video?.title)}
+            </h3>
+            <p className="dark:text-gray-200 text-gray-600 text-sm">
+              @{video?.owner?.name || video?.owner?.username}
+            </p>
+            <p className="text-sm font-medium dark:text-white">
+              {video?.views} views • {timeAgo(video?.createdAt)}
+            </p>
+
+            {isOptions && (
+              <div
+                onClick={(e) => handleOptions(e)}
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-300"
+                ref={optionsRef}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-                />
-              </svg>
-              {showOptions && (
-                <div className="absolute right-10 top-5 rounded-lg  bg-zinc-600">
-                  <ul className="w-full h-full rounded-lg py-2 px-5">
-                    <li
-                      onClick={() => handleVideoUpdate(video)}
-                      className="text-gray-300  hover:text-gray-400"
-                    >
-                      Update
-                    </li>
-                    <li
-                      onClick={() => handleVideoDelete(video?._id)}
-                      className="text-gray-300  hover:text-gray-400"
-                    >
-                      Delete
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
+                <svg
+                  id={video?._id}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                  />
+                </svg>
+                {openOptionsId === video?._id && (
+                  <div className="absolute z-50 right-6 top-0 rounded-lg bg-gray-50 border border-gray-400 p-3 shadow-lg">
+                    <ul className="w-full space-y-2">
+                      <li
+                        onClick={() => handleVideoUpdate(video)}
+                        className="bg-amber-500 text-white p-2 rounded-full hover:bg-amber-700 transition duration-200 flex items-center gap-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-4 h-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M16.5 7.5l-9 9M12 4.5h5.25a2.25 2.25 0 012.25 2.25v13.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 20.25V6.75A2.25 2.25 0 016.75 4.5H12z"
+                          />
+                        </svg>
+                        Update
+                      </li>
+
+                      <li
+                        onClick={() => handleDeleteClick(video)}
+                        className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition duration-200 flex items-center gap-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-4 h-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                          />
+                        </svg>
+                        Delete
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)} // Close modal
+        onConfirm={handleDeleteConfirm} // Handle confirmation
+        videoTitle={videoToDelete ? videoToDelete.title : ""} // Pass video title to modal
+      />
     </div>
   );
 };

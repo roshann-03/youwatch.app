@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 
 const userSchema = new Schema(
   {
+    googleId: String,
     username: {
       type: String,
       required: true,
@@ -44,6 +45,10 @@ const userSchema = new Schema(
     },
     refreshToken: {
       type: String,
+    },
+    isGoogleUser: {
+      type: Boolean,
+      default: false,
     },
     resetPasswordToken: String,
     resetPasswordExpiry: Date,
