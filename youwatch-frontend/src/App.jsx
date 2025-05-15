@@ -24,6 +24,8 @@ import OAuthSuccess from "./pages/OAuthSuccess";
 import NotFoundPage from "./pages/NotFoundPage";
 import "./index.css";
 import LoadingSpinner from "./components/LoadingSpinner";
+import SearchResultPortal from "./components/SearchResultPort";
+import { SearchResultProvider } from "./ContextAPI/SearchResultContext";
 
 // PrivateRoute to protect routes
 const PrivateRoute = ({ isAuthenticated, children }) => {
@@ -100,7 +102,11 @@ const App = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {isLoggedIn ? <LoggedInNav onLogout={handleLogout} /> : <LoggedOutNav />}
-
+      {isLoggedIn ? (
+        <SearchResultPortal results={["lalala"]} visible={true} />
+      ) : (
+        ""
+      )}
       <Routes>
         {/* Redirect logged-in users away from login and register pages */}
         <Route
@@ -216,7 +222,9 @@ const App = () => {
 const AppWithProvider = () => {
   return (
     <AuthProvider>
-      <App />
+      <SearchResultProvider>
+        <App />
+      </SearchResultProvider>
     </AuthProvider>
   );
 };

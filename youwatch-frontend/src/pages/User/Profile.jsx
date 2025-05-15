@@ -9,7 +9,6 @@ import ChangePassword from "./ChangePassword"; // Your ChangePassword component
 const UserProfile = () => {
   const [user, setUser] = useState({
     username: "",
-    email: "",
     fullName: "",
   });
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
@@ -23,7 +22,6 @@ const UserProfile = () => {
       setUser({
         fullName: storedUser.fullName || "",
         username: storedUser.username || "",
-        email: storedUser.email || "",
       });
     }
   }, []);
@@ -110,20 +108,6 @@ const UserProfile = () => {
                 type="text"
                 name="fullName"
                 value={user.fullName}
-                onChange={handleInputChange}
-                className="w-full p-4 dark:bg-gray-700 bg-gray-100 text-black border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
-                required
-              />
-            </div>
-
-            <div className="mb-8">
-              <label className="block text-sm font-medium text-black dark:text-gray-300 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={user.email}
                 onChange={handleInputChange}
                 className="w-full p-4 dark:bg-gray-700 bg-gray-100 text-black border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
                 required

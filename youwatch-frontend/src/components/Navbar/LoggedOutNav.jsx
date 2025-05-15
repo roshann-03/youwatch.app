@@ -1,9 +1,9 @@
 // src/components/LoggedOutNav.js
 import { Link } from "react-router-dom";
-
+import ThemeToggle from "../ThemeToggle";
 const LoggedOutNav = () => {
   return (
-    <nav className="bg-black p-4 flex justify-start items-center">
+    <nav className="dark:bg-black shadow-lg  p-4 flex justify-between items-center">
       <div className="logo">
         <Link to="/">
           <div className="logo-container flex justify-center items-center">
@@ -14,10 +14,11 @@ const LoggedOutNav = () => {
                 className="h-full w-full rounded-lg"
               />
             </div>
-            <h1 className="text-white font-bold text-xl ml-2">YouWatch</h1>
+            <h1 className="dark:text-white font-bold text-xl ml-2">YouWatch</h1>
           </div>
         </Link>
       </div>
+      <ThemeToggle />
     </nav>
   );
 };

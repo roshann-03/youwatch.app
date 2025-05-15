@@ -8,12 +8,12 @@ import passport from "passport";
 import morgan from "morgan";
 
 const app = express();
-app.use(morgan("combined"));
+app.use(morgan("dev"));
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "https://youwatch-api.onrender.com",
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
     credentials: true,
-    sameSite: "None",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
   })
 );
 

@@ -50,8 +50,8 @@ const Subscription = ({ channelId }) => {
     <div className="subscribeButton">
       <button
         className={`${
-          subscriptionStatus ? "bg-red-600 text-white" : "bg-white text-black"
-        } font-[inter] text-sm font-semibold px-4 py-2 rounded-3xl`}
+          subscriptionStatus ? "bg-red-600 text-white" : "bg-gray-800 text-white dark:bg-white dark:text-black"
+        }  text-sm  font-semibold px-4 py-2 rounded-3xl`}
         onClick={handleSubscribe}
       >
         {subscriptionStatus ? "Subscribed" : "Subscribe"}

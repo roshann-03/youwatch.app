@@ -113,7 +113,7 @@ const LoggedInNav = ({ onLogout }) => {
 
           {/* Logo */}
           <Link to="/" className=" items-center gap-2 lg:flex hidden  ">
-            <div className="h-10 w-20 rounded-lg overflow-hidden">
+            <div className="h-14 w-20 rounded-lg overflow-hidden">
               <img
                 src="/logo.jpg"
                 alt="YouWatch Logo"

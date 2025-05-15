@@ -98,9 +98,9 @@ const Register = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-gray-800 via-gray-900 to-black p-4">
-      <div className="w-full max-w-2xl bg-gray-950 p-8 rounded-xl shadow-2xl">
-        <h2 className="text-3xl font-bold text-center text-white mb-6">
+    <div className="flex justify-center items-center min-h-screen dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-black p-4">
+      <div className="w-full max-w-2xl dark:bg-gray-950 p-8 rounded-xl shadow-2xl">
+        <h2 className="text-3xl font-bold text-center dark:text-white mb-6">
           Create Account
         </h2>
 
@@ -158,7 +158,7 @@ const Register = () => {
                 value={formData[field]}
                 onChange={handleChange}
                 placeholder={field}
-                className="peer w-full h-12 rounded-md border border-gray-700 bg-transparent px-3 pt-4 text-white placeholder-transparent focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                className="peer w-full h-12 rounded-md border border-gray-700 bg-transparent px-3 pt-4 dark:text-white placeholder-transparent focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
               />
               <label
                 htmlFor={field}

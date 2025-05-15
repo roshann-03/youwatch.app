@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
 import mongoose from "mongoose";
-import ngrok from "ngrok";
+
 dotenv.config();
 
 async function startServer() {

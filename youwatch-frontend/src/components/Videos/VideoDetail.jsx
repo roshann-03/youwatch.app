@@ -181,9 +181,9 @@ const VideoDetail = () => {
   };
 
   return (
-    <div className="flex flex-col w-full justify-center items-center bg-black text-gray-50">
+    <div className="flex flex-col w-full justify-center items-center dark:bg-black dark:text-gray-50">
       <div className="relative w-full">
-        <div className="video-container flex justify-center w-full bg-black relative">
+        <div className="video-container flex justify-center w-full dark:bg-black relative">
           <video
             controls
             className="w-full max-h-[80vh] h-auto rounded-xl bg-black"
@@ -212,9 +212,9 @@ const VideoDetail = () => {
               </div>
             </div>
             <Subscription channelId={video?.owner?._id} />
-            <div className="likes-container flex items-center justify-center gap-3 bg-zinc-700 px-5 py-2 rounded-3xl">
+            <div className="likes-container flex items-center justify-center gap-3 bg-zinc-500  dark:bg-zinc-700 px-5 py-2 rounded-3xl">
               <button type="button" className="like" onClick={handleLike}>
-                <p className="flex gap-2 font-semibold font-[inter] text-sm items-center">
+                <p className="flex gap-2 font-semibold text-white text-sm items-center">
                   {isLiked ? (
                     <BiSolidLike
                       style={{ color: "white", height: "25px", width: "25px" }}
@@ -227,7 +227,7 @@ const VideoDetail = () => {
                   {formatLikes(likesCount)}
                 </p>
               </button>
-              <p className="h-full w-[1px] bg-zinc-400">&nbsp;</p>
+              <p className="h-full w-[1px] dark:bg-zinc-400">&nbsp;</p>
               <button type="button" className="like" onClick={handleDislike}>
                 {isDisliked ? (
                   <BiSolidDislike
@@ -243,7 +243,7 @@ const VideoDetail = () => {
           </div>
         </div>
 
-        <div className="justify-between items-center m-5 bg-zinc-700 rounded-xl p-5">
+        <div className="justify-between items-center m-5 text-white bg-zinc-500  dark:bg-zinc-700 rounded-xl p-5">
           <div>
             {video?.views} views • {timeAgo(video?.createdAt)}
           </div>
@@ -264,7 +264,7 @@ const VideoDetail = () => {
         <CommentSection />
       </div>
 
-      <h1 className="text-2xl font-bold text-left flex justify-start border-t-2 border-gray-300 p-5 w-full">
+      <h1 className="text-2xl font-bold text-left flex justify-start border-t-2  border-gray-300 p-5 w-full">
         More Videos
       </h1>
       <VideoList />

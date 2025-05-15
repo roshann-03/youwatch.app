@@ -1,0 +1,19 @@
+.customProse ul li {
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.customProse ul li::marker {
+  color: #1f2937;
+  font-weight: bold;
+}
+
+.customProse.dark ul li {
+  color: #e1e1e1;
+  font-weight: 500;
+}
+
+.customProse.dark ul li::marker {
+  color: #e1e1e1;
+  font-weight: bold;
+}

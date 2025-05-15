@@ -59,8 +59,8 @@ export const googleAuthController = asyncHandler(async (req, res) => {
     // Send tokens as HTTP-only cookies
     const options = {
       httpOnly: true,
-      secure: true,
-      sameSite: "None", // Set to false if not using HTTPS during development
+      secure: process.env.NODE_ENV === "production", // Set to true only for production,
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
     };
 
     res

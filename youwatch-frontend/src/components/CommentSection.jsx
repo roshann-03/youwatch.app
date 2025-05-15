@@ -148,17 +148,17 @@ const CommentSection = () => {
   };
 
   return (
-    <div className="mt-4 items-center justify-center px-5">
+    <div className="mt-4 items-center  justify-center px-5">
       <div className="rounded px-5">
-        <p className="text-xl text-gray-50 font-medium mb-5 font-[inter]">
+        <p className="text-xl dark:text-gray-50 font-medium mb-5 ">
           {formatCommentsCount(comments.length)}
         </p>
         <div className="flex items-center w-full">
-          <div className="user-img">
+          <div className="user-img  w-14 rounded-full object-cover object-center">
             <img
               src={user.avatar}
               alt={user.username}
-              className="w-10 h-10 rounded-full mr-2"
+              className="w-full h-full rounded-full mr-2"
             />
           </div>
           <form
@@ -188,13 +188,13 @@ const CommentSection = () => {
               <div className="flex flex-col relative">
                 <div className="flex gap-2 items-center mb-1">
                   <p className="font-semibold">@{c.owner.username}</p>
-                  <p className="text-sm text-gray-300 tracking-tight font-[inter]">
+                  <p className="text-sm dark:text-gray-300 tracking-tight">
                     {timeAgo(c.createdAt)}
                   </p>
                   {user._id === c.owner._id && (
                     <button
                       onClick={() => toggleOptions(c._id)}
-                      className="text-gray-300 text-xl font-bold ml-3 hover:text-gray-400 focus:outline-none"
+                      className="dark:text-gray-300 text-xl font-bold ml-3 hover:text-gray-400 focus:outline-none"
                     >
                       ⋮
                     </button>
@@ -255,7 +255,7 @@ const CommentSection = () => {
                   </form>
                 ) : (
                   <>
-                    <p className="text-gray-200 max-w-md break-words">
+                    <p className="dark:text-gray-200 max-w-md break-words">
                       {c.content}
                     </p>
                     <div className="flex gap-2">

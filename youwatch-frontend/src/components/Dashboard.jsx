@@ -6,7 +6,7 @@ const Dashboard = () => {
   const { isLoggedIn } = useAuth(); // Get isLoggedIn state from the context
 
   return (
-    <div className="min-h-screen flex-1">
+    <div className="min-h-screen flex-1 ">
       <VideoList />
       {/* Render Footer only if the user is logged in */}
       {isLoggedIn && <Footer />}

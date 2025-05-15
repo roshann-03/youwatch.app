@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16"
+  },
+  "dependencies": {
+    "dompurify": "^3.2.5"
+  }
+}

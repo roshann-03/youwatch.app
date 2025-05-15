@@ -66,10 +66,10 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-gray-800 via-gray-900 to-black p-4">
-      <div className="w-full max-w-md bg-gray-950 rounded-2xl shadow-2xl p-8 sm:p-10">
-        <h2 className="text-3xl font-bold text-center text-white mb-6">
-          Sign In
+    <div className="flex justify-center items-center min-h-screen dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-black p-4">
+      <div className="w-full max-w-md dark:bg-gray-950 rounded-2xl shadow-2xl p-8 sm:p-10">
+        <h2 className="text-3xl font-bold text-center dark:text-white mb-6">
+          Login Account
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -88,7 +88,7 @@ const Login = ({ onLogin }) => {
                 value={formData[name]}
                 onChange={handleChange}
                 required
-                className="peer h-12 w-full rounded-md border border-gray-600 bg-transparent px-3 pt-4 text-white placeholder-transparent focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all"
+                className="peer h-12 w-full rounded-md border border-gray-600 bg-transparent px-3 pt-4 dark:text-white placeholder-transparent focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all"
                 placeholder={label}
               />
               <label

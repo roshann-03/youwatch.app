@@ -108,14 +108,14 @@ const VideoCard = ({ video, isOptions = false, onDeleteSuccess }) => {
   }, []);
 
   return (
-    <div>
+    <div className=" h-full">
       <div
-        className="video-card shadow-lg  flex flex-col w-full rounded-xl cursor-pointer transition-all duration-300"
+        className="video-card dark:bg-zinc-700 shadow-lg h-full flex flex-col w-full    rounded-xl cursor-pointer transition-all duration-300 "
         onClick={handleClick}
       >
-        <div className="relative dark:text-white">
+        <div className="relative    dark:text-white ">
           <img
-            className="w-full h-44 object-cover rounded-xl"
+            className="w-full h-44 object-cover rounded-xl "
             src={video?.thumbnail}
             alt={video?.title}
           />
@@ -125,7 +125,7 @@ const VideoCard = ({ video, isOptions = false, onDeleteSuccess }) => {
           </h3>
         </div>
 
-        <div className="flex items-start gap-2 p-2">
+        <div className="flex items-start gap-2 p-2 ">
           <div className="w-12 h-12 rounded-full overflow-hidden">
             {video?.owner.avatar && (
               <img
@@ -136,13 +136,13 @@ const VideoCard = ({ video, isOptions = false, onDeleteSuccess }) => {
             )}
           </div>
           <div className="flex-1 relative">
-            <h3 className="font-medium break-words dark:text-white">
+            <h3 className="font-medium break-words dark:text-white text-black">
               {videoTitleTruncate(video?.title)}
             </h3>
             <p className="dark:text-gray-200 text-gray-600 text-sm">
               @{video?.owner?.name || video?.owner?.username}
             </p>
-            <p className="text-sm font-medium dark:text-white">
+            <p className="text-sm font-medium dark:text-white text-gray-600">
               {video?.views} views • {timeAgo(video?.createdAt)}
             </p>
 
@@ -168,7 +168,7 @@ const VideoCard = ({ video, isOptions = false, onDeleteSuccess }) => {
                   />
                 </svg>
                 {openOptionsId === video?._id && (
-                  <div className="absolute z-50 right-6 top-0 rounded-lg bg-gray-50 border border-gray-400 p-3 shadow-lg">
+                  <div className="absolute z-50 right-6 top-0 rounded-lg bg-gray-50  border-gray-400 p-3 shadow-lg">
                     <ul className="w-full space-y-2">
                       <li
                         onClick={() => handleVideoUpdate(video)}

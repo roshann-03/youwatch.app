@@ -62,12 +62,12 @@ const ChannelMenu = () => {
 
   return (
     <div className="bg-gradient-to-b from-black to-gray-800 min-h-screen">
-      <div className="max-w-7xl mx-auto bg-rose-100 rounded-3xl shadow-2xl space-y-12 mt-40 z-10 relative">
+      <div className=" mx-auto bg-rose-100 shadow-2xl space-y-12  z-10 relative">
         {/* Channel Details */}
         <div
-          className=" flex flex-col sm:flex-row items-center gap-8 bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 rounded-xl p-8"
+          className=" flex flex-col sm:flex-row items-center gap-8  rounded-xl p-8"
           style={{
-            backgroundImage: `url(${channel.coverImage}), linear-gradient(to right, rgba(255, 99, 71, 0.7), rgba(255, 105, 180, 0.7))`,
+            backgroundImage: `url(${channel.coverImage}), linear-gradient(to right, rgba(255, 19, 71, 0.3), rgba(255, 105, 180, 0.7))`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundBlendMode: "overlay",

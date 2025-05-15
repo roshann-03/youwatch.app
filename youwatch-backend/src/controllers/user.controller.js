@@ -128,8 +128,8 @@ const loginUser = asyncHandler(async (req, res) => {
   // Set cookie options
   const options = {
     httpOnly: true,
-    secure: true, // Set to false if not using HTTPS during development
-    sameSite: "None",
+    secure: process.env.NODE_ENV === "production", // Set to true only for production, // Set to false if not using HTTPS during development
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
   };
 
   return res
@@ -164,8 +164,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: true,
-    sameSite: "None",
+    secure: process.env.NODE_ENV === "production", // Set to true only for production,
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
   };
 
   return res
@@ -201,7 +201,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production", // Set to true only for production,
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
       maxAge: 86400000,
     };
 
@@ -259,8 +260,8 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-  const { username, fullName, email } = req.body;
-  if (!username || !fullName || !email) {
+  const { username, fullName } = req.body;
+  if (!username || !fullName) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -270,7 +271,6 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
       $set: {
         username,
         fullName,
-        email: email,
       },
     },
     { new: true }
@@ -549,8 +549,8 @@ const deleteUserAccount = async (req, res) => {
     // Find user by ID and delete it
     const options = {
       httpOnly: true,
-      secure: true,
-      sameSite: "None",
+      secure: process.env.NODE_ENV === "production", // Set to true only for production,
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
     };
     res
       .status(200)
