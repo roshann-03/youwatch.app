@@ -43,7 +43,7 @@ export default function TweetForm({ onTweetCreated }) {
       onSubmit={handleSubmit}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-4 border-b border-gray-900  bg-white"
+      className="p-4 border-b border-gray-900 dark:bg-zinc-800   bg-white"
     >
       <div className="flex items-start space-x-3 ">
         <div className="w-10 h-10 rounded-full ring-2 ring-sky-500  bg-blue-100 flex items-center justify-center text-blue-600 font-bold">

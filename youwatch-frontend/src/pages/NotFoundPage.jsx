@@ -4,7 +4,7 @@ const NotFoundPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black text-white">
+    <div className="flex items-center justify-center min-h-screen dark:bg-black dark:text-white">
       <div className="text-center space-y-8">
         {/* 404 Title */}
         <h1 className="text-6xl font-bold text-red-500">404</h1>

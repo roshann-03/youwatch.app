@@ -38,11 +38,11 @@ export default function TweetItem({ tweet, onDelete, onUpdate }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className=" p-10 border-b  border-gray-500 hover:bg-zinc-200 transition duration-300"
+      className=" p-10 border-b  border-gray-500 dark:text-white dark:hover:bg-zinc-700  hover:bg-zinc-200 transition duration-300"
     >
       <div className="flex items-start space-x-3">
         {/* Avatar */}
-        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+        <div className="w-10 h-10 rounded-full dark:bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
           <img
             src={`${tweet.owner?.avatar}`}
             className="rounded-full h-full w-full"
@@ -56,11 +56,11 @@ export default function TweetItem({ tweet, onDelete, onUpdate }) {
             <div>
               <a
                 href={`/channel/${tweet.owner?.username}`}
-                className="font-semibold  text-gray-800 hover:underline"
+                className="font-semibold dark:text-gray-200  text-gray-800 hover:underline"
               >
                 @{tweet.owner?.username || "user"}
               </a>
-              <span className="ml-2 text-sm  text-gray-500">
+              <span className="ml-2 text-sm  dark:text-gray-200  text-gray-500">
                 {formattedDate}
               </span>
             </div>
@@ -92,7 +92,7 @@ export default function TweetItem({ tweet, onDelete, onUpdate }) {
                 onChange={(value) => setNewContent(value)}
                 modules={modules}
                 formats={formats}
-                className="bg-zinc-100 rounded-lg text-sm"
+                className="bg-zinc-100 rounded-lg text-sm text-black"
               />
 
               <button
@@ -104,7 +104,7 @@ export default function TweetItem({ tweet, onDelete, onUpdate }) {
             </div>
           ) : (
             <div
-              className={`mt-2 prose prose-lg max-w-none  ${styles.customProse}`}
+              className={`mt-2 prose prose-lg max-w-none ${styles.customProse}`}
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(tweet.content),
               }}
