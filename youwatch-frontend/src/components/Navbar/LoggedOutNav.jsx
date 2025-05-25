@@ -9,7 +9,7 @@ const LoggedOutNav = () => {
           <div className="logo-container flex justify-center items-center">
             <div className="logo h-10 w-14 rounded-lg flex justify-center items-center object-center object-cover">
               <img
-                src={`/logo3.jpg`}
+                src={`/logo3.png`}
                 alt=""
                 className="h-full w-full rounded-lg"
               />
