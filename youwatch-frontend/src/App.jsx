@@ -133,10 +133,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/otp-verification"
-          element={<OtpVerification onLogin={handleLogin} />}
-        />
+        <Route path="/otp-verification" element={<OtpVerification />} />
         <Route
           path="/set-password/"
           element={

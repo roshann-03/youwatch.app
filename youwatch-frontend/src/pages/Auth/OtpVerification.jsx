@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 import { axiosJSON } from "../../api/axiosInstances";
 import { useAuth } from "../../ContextAPI/AuthContext";
 
@@ -86,7 +86,7 @@ const OTPVerification = () => {
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
         </form>
-
+            <p className="dark:text-gray-200 pt-2">Otp will expire in 5 minutes</p>
         <p className="mt-4 text-sm text-center">
           <Link to="/login" className="text-blue-600 hover:underline">
             Back to Login
