@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from "react";
-import axios from "axios";
 import {
   FaPlay,
   FaPause,
@@ -7,6 +6,7 @@ import {
   FaVolumeUp,
   FaExpand,
 } from "react-icons/fa";
+import { axiosJSON } from "../../api/axiosInstances";
 
 export default function CustomVideoPlayer({ video }) {
   const videoRef = useRef(null);
@@ -69,7 +69,6 @@ export default function CustomVideoPlayer({ video }) {
     const updateTime = () => setProgress(vid.currentTime);
     const updateDuration = () => setDuration(vid.duration);
 
-    // Keyboard shortcuts
     const handleKeyDown = (e) => {
       if (e.target.tagName === "INPUT") return;
       switch (e.key.toLowerCase()) {
@@ -105,29 +104,46 @@ export default function CustomVideoPlayer({ video }) {
     };
   }, [duration]);
 
-  // 📈 View Tracking Effect (10s play threshold)
+  // ✅ Improved View Tracking (actual watched time)
   useEffect(() => {
     const vid = videoRef.current;
-    let timeout;
-    const handleTimeUpdate = async () => {
-      if (viewed.current) return;
+    let watchedTime = 0;
+    let lastTime = 0;
+    let interval;
 
-      const percentageWatched = (vid.currentTime / vid.duration) * 100;
+    const trackWatchTime = () => {
+      const currentTime = vid.currentTime;
+      // Only count if it's a natural progression (not skip)
+      if (Math.abs(currentTime - lastTime) < 1.2) {
+        watchedTime += 1;
+      }
+      lastTime = currentTime;
 
-      if (vid.currentTime >= 10 || percentageWatched >= 80) {
+      if (watchedTime >= 10 && !viewed.current) {
         viewed.current = true;
-        try {
-          await axios.post(`/api/video/track-view/${video._id}`);
-        } catch (err) {
-          console.error("Error tracking view:", err);
-        }
+        axiosJSON
+          .post(`/videos/track-view/${video._id}`)
+          .catch((err) => console.error("Error tracking view:", err));
       }
     };
 
-    vid.addEventListener("timeupdate", handleTimeUpdate);
+    const handlePlay = () => {
+      interval = setInterval(trackWatchTime, 1000);
+    };
+
+    const handlePause = () => {
+      clearInterval(interval);
+    };
+
+    vid.addEventListener("play", handlePlay);
+    vid.addEventListener("pause", handlePause);
+    vid.addEventListener("ended", handlePause);
+
     return () => {
-      vid.removeEventListener("timeupdate", handleTimeUpdate);
-      clearTimeout(timeout);
+      clearInterval(interval);
+      vid.removeEventListener("play", handlePlay);
+      vid.removeEventListener("pause", handlePause);
+      vid.removeEventListener("ended", handlePause);
     };
   }, [video._id]);
 
@@ -142,18 +158,16 @@ export default function CustomVideoPlayer({ video }) {
   };
 
   return (
-    <div className="video-container relative w-full max-w-4xl mx-auto bg-black  overflow-hidden shadow-lg">
+    <div className="video-container relative w-full max-w-4xl mx-auto bg-black overflow-hidden shadow-lg">
       <video
         ref={videoRef}
         className="w-full h-auto bg-black"
         src={video.videoFile}
         onClick={togglePlay}
-        controls={false} // hide default controls
+        controls={false}
       />
 
-      {/* Custom Controls */}
       <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-md text-white p-4 flex flex-col gap-2">
-        {/* Progress Bar */}
         <input
           type="range"
           min={0}
@@ -161,10 +175,9 @@ export default function CustomVideoPlayer({ video }) {
           step={0.1}
           value={progress}
           onChange={handleProgress}
-          className="w-full  h-1  accent-gray-200"
+          className="w-full h-1 accent-gray-200"
         />
 
-        {/* Buttons */}
         <div className="flex justify-between items-center gap-4">
           <div className="flex gap-4 items-center">
             <button onClick={togglePlay} className="text-xl">

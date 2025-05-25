@@ -196,8 +196,8 @@ const getVideoById = asyncHandler(async (req, res) => {
 
 const handleViews = asyncHandler(async (req, res) => {
   try {
-    const videoId = req.params.id;
-    const userIdentifier = req.ip || req.body.userId || "anonymous";
+    const videoId = req.params?.id;
+    const userIdentifier = req.user?._id?.toString() || req.ip || "anonymous";
 
     const video = await Video.findById(videoId);
 

@@ -199,7 +199,7 @@ const VideoDetail = () => {
     <div className="flex flex-col w-full justify-center items-center dark:bg-black dark:text-gray-50">
       <div className="relative w-full">
         <div className="video-container flex justify-center w-full dark:bg-black relative">
-          <CustomVideoPlayer video={{ videoFile: video.videoFile }} />
+          <CustomVideoPlayer video={ video } />
         </div>
         <h1 className="text-2xl font-semibold px-5 mt-2">{video?.title}</h1>
         <div className="flex items-center px-5 mt-2 gap-10 cursor-pointer w-full">
