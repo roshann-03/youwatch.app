@@ -33,12 +33,13 @@ export const googleAuthController = asyncHandler(async (req, res) => {
     // Find or create the user in the database
     let user = await User.findOne({ email });
 
-    if (user && !user?.isGoogleUser) {
-      return res
-        .status(409)
-        .json(new ApiError(409, "User with email or username already exists"));
-    }
-    
+    // Prevent user login with direct google if already exists
+    // if (user || !user?.isGoogleUser) {
+    //   return res
+    //     .status(409)
+    //     .json(new ApiError(409, "User with email or username already exists"));
+    // }
+
     let hasPassword = false;
     if (!user) {
       const randomPassword = await bcrypt.hash(uuidv4(), 10); // Safe, hashed garbage password
