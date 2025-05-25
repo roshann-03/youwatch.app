@@ -10,7 +10,7 @@ export default function Home() {
   const user = JSON.parse(localStorage.getItem("user"));
   const fetchTweets = async () => {
     const res = await getUserTweets(user._id);
-    setTweets(res.data.data);
+    setTweets((res.data.data).reverse());
   };
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function Home() {
           onTweetCreated={(newTweet) => setTweets([newTweet, ...tweets])}
         />
         <TweetList
-          tweets={[...tweets].reverse()}
+          tweets={[...tweets]}
           onDelete={(id) => setTweets(tweets.filter((t) => t._id !== id))}
           onUpdate={(updated) =>
             setTweets(tweets.map((t) => (t._id === updated._id ? updated : t)))

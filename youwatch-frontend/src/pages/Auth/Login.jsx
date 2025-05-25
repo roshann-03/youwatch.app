@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import GoogleLoginButton from "../../components/Auth/GoogleLoginButton";
 import { axiosJSON } from "../../api/axiosInstances";
+import { useAuth } from "../../ContextAPI/AuthContext";
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -13,7 +14,7 @@ const Login = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
+  const { login } = useAuth();
   const notify = (message) => toast(message);
 
   useEffect(() => {
@@ -50,6 +51,7 @@ const Login = ({ onLogin }) => {
         const user = response.data.data.user;
         localStorage.setItem("user", JSON.stringify(user));
         notify("Login successful!");
+        login();
         onLogin();
         navigate("/");
       } else {

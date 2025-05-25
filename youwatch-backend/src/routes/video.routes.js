@@ -8,6 +8,7 @@ import {
   updateVideo,
   getAllVideosById,
   getLikesByVideoId,
+  handleViews,
 } from "../controllers/video.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -42,5 +43,7 @@ router
 
 router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
 router.route("/likes/:videoId").get(getLikesByVideoId);
+
+router.post("/track-view/:id", handleViews);
 
 export default router;

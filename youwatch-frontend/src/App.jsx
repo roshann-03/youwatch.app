@@ -26,7 +26,7 @@ import "./index.css";
 import LoadingSpinner from "./components/LoadingSpinner";
 import SearchResultPortal from "./components/SearchResultPort";
 import { SearchResultProvider } from "./ContextAPI/SearchResultContext";
-
+import SetPassword from "./pages/Auth/SetPassword";
 // PrivateRoute to protect routes
 const PrivateRoute = ({ isAuthenticated, children }) => {
   if (!isAuthenticated) {
@@ -137,6 +137,15 @@ const App = () => {
           path="/otp-verification"
           element={<OtpVerification onLogin={handleLogin} />}
         />
+        <Route
+          path="/set-password/"
+          element={
+            <RedirectedRoute isAuthenticated={isLoggedIn}>
+              <SetPassword />
+            </RedirectedRoute>
+          }
+        />
+
         <Route
           path="/upload"
           element={

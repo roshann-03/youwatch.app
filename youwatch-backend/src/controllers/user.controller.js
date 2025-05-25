@@ -73,6 +73,7 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     username: username.toLowerCase(),
+    hasPassword: true,
   };
 
   //Create a new user
@@ -229,16 +230,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
   const user = await User.findById(req.user?._id);
-  if (user?.isGoogleUser) {
-    return res
-      .status(400)
-      .json(
-        new ApiError(
-          400,
-          "You have used google account to signup can't change the password"
-        )
-      );
-  }
+
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
   if (!isPasswordCorrect) {
@@ -466,6 +458,22 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     );
 });
 
+const setPasswordController = asyncHandler(async (req, res) => {
+  const { userId, password } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    user.password = password;
+    await user.save({ validateBeforeSave: false });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Password set successfully"));
+  } catch (error) {
+    console.log("Error set password:", error);
+    throw new ApiError(501, "Internal server error");
+  }
+});
+
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
@@ -589,4 +597,5 @@ export {
   forgotPassword,
   resetPassword,
   deleteUserAccount,
+  setPasswordController,
 };

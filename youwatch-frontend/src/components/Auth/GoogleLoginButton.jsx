@@ -2,10 +2,11 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { axiosJSON } from "../../api/axiosInstances"; // Import your axios instance
+import { useAuth } from "../../ContextAPI/AuthContext";
 
 const GoogleLoginButton = () => {
   const navigate = useNavigate();
-
+  const { login } = useAuth();
   const handleLoginSuccess = async (response) => {
     const idToken = response.credential; // ✅ Correctly access the token
 
@@ -19,8 +20,12 @@ const GoogleLoginButton = () => {
         const { user } = res.data;
         localStorage.setItem("user", JSON.stringify(user));
         toast.success("Successfully logged in with Google!");
-        navigate("/", { replace: true });
-        window.location.href = window.location.href;
+        if (user?.hasPassword) {
+          login();
+          navigate("/", { replace: true });
+        } else {
+          navigate("/set-password", { replace: true });
+        }
       } else {
         toast.error("Failed to login with Google. Please try again!");
       }

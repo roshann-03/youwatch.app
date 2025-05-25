@@ -38,7 +38,8 @@ export const googleAuthController = asyncHandler(async (req, res) => {
         .status(409)
         .json(new ApiError(409, "User with email or username already exists"));
     }
-
+    
+    let hasPassword = false;
     if (!user) {
       const randomPassword = await bcrypt.hash(uuidv4(), 10); // Safe, hashed garbage password
       user = await User.create({
@@ -48,7 +49,10 @@ export const googleAuthController = asyncHandler(async (req, res) => {
         username: email.split("@")[0],
         isGoogleUser: true,
         password: randomPassword,
+        hasPassword: false,
       });
+    } else {
+      hasPassword = true;
     }
     // console.log(user);
     // Generate access and refresh tokens
@@ -76,6 +80,7 @@ export const googleAuthController = asyncHandler(async (req, res) => {
           avatar: user.avatar,
           username: user.username,
           isGoogleUser: user.isGoogleUser,
+          hasPassword: hasPassword,
         },
       });
   } catch (error) {

@@ -7,17 +7,21 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createTweet = asyncHandler(async (req, res) => {
   //TODO: create tweet
-  const { content } = req.body;
-
+  const { content, imgUrl } = req.body;
   if (!content) {
     return res.status(400).json(new ApiError(400, "Content is required"));
   }
   if (!req.user || !req.user._id) {
     return res.status(401).json(new ApiError(401, "User is not authenticated"));
   }
+  const userId = req.user._id;
+  const owner = await User.findById({ _id: userId }).select(
+    "-password -refreshToken"
+  );
   const tweet = await Tweet.create({
     content,
-    owner: req.user._id,
+    owner: owner,
+    images: imgUrl ? [imgUrl] : [],
   });
   if (!tweet) {
     return res.status(400).json(new ApiError(400, "Tweet cannot be created"));
@@ -104,13 +108,29 @@ const deleteTweet = asyncHandler(async (req, res) => {
 });
 
 const getAllTweets = asyncHandler(async (req, res) => {
-  const tweets = await Tweet.find({}).populate("owner").sort({ createdAt: -1 });
-  if (!tweets || tweets.length === 0) {
-    return res.status(404).json(new ApiError(404, "No tweets found"));
-  }
-  return res
-    .status(200)
-    .json(new ApiResponse(200, tweets, "All tweets fetched"));
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+
+  const totalTweets = await Tweet.countDocuments();
+
+  const tweets = await Tweet.find({})
+    .populate("owner")
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        tweets,
+        currentPage: page,
+        totalPages: Math.ceil(totalTweets / limit),
+        totalTweets,
+      },
+      "Paginated tweets fetched"
+    )
+  );
 });
 
 export { createTweet, getUserTweets, updateTweet, deleteTweet, getAllTweets };

@@ -108,6 +108,7 @@ export const verifyOTP = asyncHandler(async (req, res) => {
       password: user.password,
       username: user.username,
       isGoogleUser: false,
+      hasPassword: true,
     });
 
     if (!newUser) {
@@ -131,7 +132,7 @@ export const verifyOTP = asyncHandler(async (req, res) => {
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set to true only for production,
-     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
     };
     return res
       .status(200)

@@ -1,16 +1,61 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { axiosJSON } from "../../api/axiosInstances";
+import { useAuth } from "../../ContextAPI/AuthContext";
 
 const OTPVerification = () => {
+  const notify = (message) => toast(message);
+  const location = useLocation();
+  const { login } = useAuth();
+  const { user } = location.state || {};
+
+  useEffect(() => {
+    notify("OTP sent to your email. Please check your inbox.");
+  }, []);
+
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleVerifyOtp = (e) => {
+  const handleVerifyOtp = async (e) => {
     e.preventDefault();
+
+    if (!otp) {
+      notify("Please enter the OTP");
+      return;
+    }
+
     setLoading(true);
-    // Perform OTP verification logic here
-    setLoading(false); // Stop loading once the verification is done
+    try {
+      const response = await axiosJSON.post(
+        "/otp/verify",
+        { otp, user },
+        { withCredentials: true }
+      );
+
+      if (response.status === 410) {
+        notify("OTP expired. Please request a new one.");
+        setOtp("");
+        setLoading(false);
+      } else if (response.status === 400) {
+        notify("Invalid OTP. Please try again.");
+        setOtp("");
+        setLoading(false);
+      } else if (response.status === 200) {
+        login();
+        notify("OTP verified successfully!");
+        localStorage.setItem("user", JSON.stringify(response.data.data));
+        setOtp("");
+        navigate("/");
+        setLoading(false);
+        // Redirect after successful verification
+      }
+    } catch (error) {
+      notify(error.response?.data?.message || "OTP verification failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

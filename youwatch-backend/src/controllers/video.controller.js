@@ -125,7 +125,7 @@ const getVideoById = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(videoId)) {
     return res.status(400).json(new ApiError(400, "Invalid video ID"));
   }
-  await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } });
+  // await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } });
   const video = await Video.aggregate([
     {
       $match: {
@@ -192,6 +192,26 @@ const getVideoById = asyncHandler(async (req, res) => {
   }
 
   return res.status(200).json(new ApiResponse(200, video[0], "Video fetched"));
+});
+
+const handleViews = asyncHandler(async (req, res) => {
+  try {
+    const videoId = req.params.id;
+    const userIdentifier = req.ip || req.body.userId || "anonymous";
+
+    const video = await Video.findById(videoId);
+
+    // Optional: prevent duplicate views from same IP/user
+    if (!video.viewedBy.includes(userIdentifier)) {
+      video.views += 1;
+      video.viewedBy.push(userIdentifier);
+      await video.save();
+    }
+
+    res.status(200).json({ views: video.views });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to track view" });
+  }
 });
 
 const updateVideo = asyncHandler(async (req, res) => {
@@ -374,4 +394,5 @@ export {
   togglePublishStatus,
   getAllVideosById,
   getLikesByVideoId,
+  handleViews,
 };

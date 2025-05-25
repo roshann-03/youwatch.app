@@ -7,15 +7,7 @@ const ChangePassword = ({ closeModel }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isGoogleUser, setIsGoogleUser] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
-
-  useEffect(() => {
-    if (user?.isGoogleUser);
-    {
-      setIsGoogleUser(true);
-    }
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,9 +42,7 @@ const ChangePassword = ({ closeModel }) => {
     }
   };
 
-  return isGoogleUser ? (
-    " You have used google account to signup can't change the password"
-  ) : (
+  return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="dark:bg-gray-800 bg-gray-100 dark:text-white text-black rounded-lg shadow-xl max-w-md w-full p-8 transform transition-all duration-300 ease-in-out scale-95 hover:scale-100">
         <h2 className="text-2xl text-transparent  font-semibold mb-6 text-center text-gradient bg-clip-text bg-gradient-to-r from-rose-500 to-purple-600">

@@ -5,6 +5,7 @@ import BackButton from "../Buttons/BackButton";
 import ForwardButton from "../Buttons/ForwardButton";
 import { FaBars, FaTimes } from "react-icons/fa"; // Importing react icons for Hamburger and Close
 import ThemeToggle from "../ThemeToggle";
+import { useAuth } from "../../ContextAPI/AuthContext";
 
 const LoggedInNav = ({ onLogout }) => {
   const [user, setUser] = useState(null);
@@ -12,7 +13,7 @@ const LoggedInNav = ({ onLogout }) => {
   const sidebarRef = useRef(null);
   const toggleButtonRef = useRef(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const { logout } = useAuth();
   // Fetch user data from localStorage
   const fetchUserData = async () => {
     try {
@@ -62,7 +63,7 @@ const LoggedInNav = ({ onLogout }) => {
         ref={sidebarRef}
         className={`fixed top-0 left-0 h-full z-30 transition-all duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } dark:bg-gradient-to-b from-gray-800 to-black bg-white dark:text-white w-64 `}
+        } dark:bg-gradient-to-b from-gray-800 to-black bg-white dark:text-white w-64  overflow-y-auto custom-scrollbar`}
       >
         <div className="flex justify-end pt-3 pr-3">
           <FaTimes
@@ -70,7 +71,7 @@ const LoggedInNav = ({ onLogout }) => {
             onClick={toggleSidebar}
           />
         </div>
-        <ul className="flex mt-8 flex-col  space-y-3 px-6 custom-scrollbar overflow-y-auto">
+        <ul className="flex mt-8 flex-col space-y-3 px-6 ">
           {[
             { label: "Home", path: "/" },
             { label: "Trending", path: "/" },
@@ -112,17 +113,14 @@ const LoggedInNav = ({ onLogout }) => {
           </div>
 
           {/* Logo */}
-          <Link to="/" className=" items-center gap-2 lg:flex hidden  ">
-            <div className="h-14 w-20 rounded-lg overflow-hidden">
+          <Link to="/" className=" items-center gap-2 flex">
+            <div className="h-10 w-42 rounded-lg overflow-hidden">
               <img
-                src="/logo.jpg"
+                src="/logo3.png"
                 alt="YouWatch Logo"
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               />
             </div>
-            <h1 className="dark:text-white font-extralight text-2xl">
-              YouWatch
-            </h1>
           </Link>
         </div>
 

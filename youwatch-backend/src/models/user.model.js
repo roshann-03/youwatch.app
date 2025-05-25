@@ -50,6 +50,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    hasPassword: {
+      type: Boolean,
+      default: false,
+    },
     resetPasswordToken: String,
     resetPasswordExpiry: Date,
   },

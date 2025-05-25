@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import VideoList from "./VideoList";
 import CommentSection from "../CommentSection";
@@ -6,9 +6,11 @@ import Subscription from "../User/Subscription";
 import { BiLike, BiDislike } from "react-icons/bi";
 import { BiSolidLike, BiSolidDislike } from "react-icons/bi";
 import { axiosJSON } from "../../api/axiosInstances";
+import CustomVideoPlayer from "./CustomVideoPlayer";
 
 const VideoDetail = () => {
   const { id } = useParams();
+  const videoRef = useRef(null);
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -180,19 +182,25 @@ const VideoDetail = () => {
     return `${seconds} second${seconds !== 1 ? "s" : ""} ago`;
   };
 
+  const handlePlayPause = () => {
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    if (vid.paused) {
+      vid.play();
+      setIsPlaying(true);
+    } else {
+      vid.pause();
+      setIsPlaying(false);
+    }
+  };
+
   return (
     <div className="flex flex-col w-full justify-center items-center dark:bg-black dark:text-gray-50">
       <div className="relative w-full">
         <div className="video-container flex justify-center w-full dark:bg-black relative">
-          <video
-            controls
-            className="w-full max-h-[80vh] h-auto rounded-xl bg-black"
-            src={video.videoFile}
-            onPlay={handlePlay}
-            onPause={handlePause}
-          />
+          <CustomVideoPlayer video={{ videoFile: video.videoFile }} />
         </div>
-
         <h1 className="text-2xl font-semibold px-5 mt-2">{video?.title}</h1>
         <div className="flex items-center px-5 mt-2 gap-10 cursor-pointer w-full">
           <div className="flex items-center gap-10">

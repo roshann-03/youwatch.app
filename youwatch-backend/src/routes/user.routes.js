@@ -14,6 +14,7 @@ import {
   resetPassword,
   forgotPassword,
   deleteUserAccount,
+  setPasswordController,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -77,5 +78,5 @@ router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
 router.route("/history").get(verifyJWT, getWatchHistory);
 
 router.delete("/delete-account", verifyJWT, deleteUserAccount);
-
+router.post("/set-password", setPasswordController);
 export default router;
