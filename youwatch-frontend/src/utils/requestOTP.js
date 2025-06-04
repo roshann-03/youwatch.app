@@ -1,16 +1,11 @@
 import axios from "axios";
-
+import { axiosJSON } from "../api/axiosInstances.js";
 export const requestOTP = async (email) => {
-    const apiUrl = "http://localhost:8000/api/v1/otp/send";
-    try {
-      const response = await axios.post(
-        apiUrl,
-        { email }
-      );
-      return response;
-    } catch (error) {
-      console.error("Error requesting OTP:", error);
-      throw error;
-    }
-  };
-  
+  try {
+    const response = await axiosJSON.post("/otp/send", { email });
+    return response;
+  } catch (error) {
+    console.error("Error requesting OTP:", error);
+    throw error;
+  }
+};

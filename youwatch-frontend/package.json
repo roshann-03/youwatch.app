@@ -19,6 +19,7 @@
     "@tiptap/starter-kit": "^2.12.0",
     "axios": "^1.7.7",
     "dompurify": "^3.2.6",
+    "firebase": "^11.8.1",
     "framer-motion": "^12.11.4",
     "js-abbreviation-number": "^1.4.0",
     "lucide-react": "^0.511.0",

@@ -1,6 +1,26 @@
 import mongoose, { Schema } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
+const viewsSchema = new Schema(
+  {
+    videoId: {
+      type: Schema.Types.ObjectId,
+      ref: "Video",
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    ipAddress: {
+      type: String,
+      default: null,
+    },
+  },
+  { timestamps: true }
+);
+
+viewsSchema.index({ createdAt: 1 }, { expireAfterSeconds: 86400 }); //auto-remove after 1 day
+
 const videoSchema = new Schema(
   {
     videoFile: {
@@ -27,7 +47,6 @@ const videoSchema = new Schema(
       type: Number,
       default: 0,
     },
-    viewedBy: [{ type: String }],
     isPublished: {
       type: Boolean,
       default: true,
@@ -45,3 +64,5 @@ const videoSchema = new Schema(
 videoSchema.plugin(mongooseAggregatePaginate);
 
 export const Video = mongoose.model("Video", videoSchema);
+const Views = mongoose.model("Views", viewsSchema);
+export { Views };

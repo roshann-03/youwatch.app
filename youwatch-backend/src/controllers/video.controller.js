@@ -1,5 +1,5 @@
 import mongoose, { isValidObjectId } from "mongoose";
-import { Video } from "../models/video.model.js";
+import { Video, Views } from "../models/video.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -197,16 +197,28 @@ const getVideoById = asyncHandler(async (req, res) => {
 const handleViews = asyncHandler(async (req, res) => {
   try {
     const videoId = req.params?.id;
-    const userIdentifier = req.user?._id?.toString() || req.ip || "anonymous";
-
     const video = await Video.findById(videoId);
 
-    // Optional: prevent duplicate views from same IP/user
-    if (!video.viewedBy.includes(userIdentifier)) {
-      video.views += 1;
-      video.viewedBy.push(userIdentifier);
+    const hasViewed = await Views.findOne({
+      videoId,
+      $or: [{ ipAddress: req.ip }, { userId: req.user?._id }],
+    });
+
+    if (!hasViewed) {
+      Views.create({
+        videoId: video._id,
+        userId: req?.user?._id,
+        ipAddress: req.ip,
+      });
+      video.views = Number(video.views || 0) + 1;
       await video.save();
     }
+    // Optional: prevent duplicate views from same IP/user
+    // if (!video.viewedBy.includes(userIdentifier)) {
+    //   video.views += 1n;
+    //   video.viewedBy.push(userIdentifier);
+    //   await video.save();
+    // }
 
     res.status(200).json({ views: video.views });
   } catch (error) {

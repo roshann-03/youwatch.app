@@ -13,8 +13,10 @@ async function startServer() {
   while (retries > 0) {
     try {
       await connectDB();
-      app.listen(process.env.PORT || 8000, async () => {
-        console.log(`⚙️ Server is running at port : ${process.env.PORT}`);
+      app.listen(process.env.PORT || 5000, async () => {
+        console.log(
+          `⚙️ Server is running at url : http://localhost:${process.env.PORT}`
+        );
       });
       break;
     } catch (error) {

@@ -6,9 +6,19 @@ import { fileURLToPath } from "url";
 import { ApiError } from "./utils/ApiError.js";
 import passport from "passport";
 import morgan from "morgan";
+import { rateLimit } from "express-rate-limit";
 
 const app = express();
+
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100,
+  })
+);
+
 app.use(morgan("dev"));
+
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || "http://localhost:5173",
@@ -17,11 +27,13 @@ app.use(
   })
 );
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { admin, adminRouter } from "./admin/admin.js";
+app.use(admin.options.rootPath, adminRouter);
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 app.use(express.json()); //{limit: "16kb"}
-app.use(express.urlencoded()); // {extended: true, limit: "16kb"}
+app.use(express.urlencoded({ extended: true, limit: "64kb" })); // {extended: true, limit: "16kb"}
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 app.use(passport.initialize());
@@ -39,9 +51,7 @@ import OTPRouter from "./routes/otp.routes.js";
 import searchRouter from "./routes/search.routes.js";
 
 //routes declaration
-
-//user routes
-// app.use("/auth", authRoutes);
+//use routes
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/tweets", tweetRouter);
 app.use("/api/v1/subscriptions", subscriptionRouter);
