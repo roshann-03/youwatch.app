@@ -22,14 +22,14 @@ import path, { dirname } from "path";
 
 AdminJS.registerAdapter({ Database, Resource });
 
-const componentLoader = new ComponentLoader();
-const DashboardPath = path.resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../admin/components/Dashboard.jsx"
-);
-const Components = {
-  Dashboard: componentLoader.add("Dashboard", DashboardPath),
-};
+// const componentLoader = new ComponentLoader();
+// const DashboardPath = path.resolve(
+//   dirname(fileURLToPath(import.meta.url)),
+//   "../admin/components/Dashboard.jsx"
+// );
+// const Components = {
+//   Dashboard: componentLoader.add("Dashboard", DashboardPath),
+// };
 
 await loadModels();
 const models = mongoose.modelNames().map((name) => mongoose.model(name));
@@ -38,10 +38,6 @@ const admin = new AdminJS({
   // componentLoader,
   resources: models,
   rootPath: "/admin",
-  componentLoader,
-  dashboard: {
-    component: Components.Dashboard,
-  },
   branding: {
     companyName: "YouWatch Admin",
     logo: `${process.env.FRONTEND_URL}/logo3.png`,
@@ -70,8 +66,12 @@ const ADMIN = {
 const adminRouter = buildAuthenticatedRouter(
   admin,
   {
-    authenticate: async (email, password) =>
-      email === ADMIN.email && password === ADMIN.password ? ADMIN : null,
+    authenticate: async (email, password) => {
+      if (email === ADMIN.email && password === ADMIN.password) {
+        return ADMIN;
+      }
+      return null;
+    },
     cookieName: "adminjs",
     cookiePassword: process.env.COOKIE_SECRET,
   },
@@ -82,8 +82,8 @@ const adminRouter = buildAuthenticatedRouter(
     secret: process.env.COOKIE_SECRET,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: true, // true in production to enforce HTTPS
+      sameSite: "lax", // lax is default-safe for same-origin
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     },
   }
