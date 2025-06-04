@@ -8,6 +8,7 @@ const UploadVideo = () => {
   const [description, setDescription] = useState("");
   const [videoFile, setVideoFile] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
+  const [isPublished, setIsPublished] = useState(true);
   const [loading, setLoading] = useState(false);
 
   // Notify user via toast
@@ -30,6 +31,7 @@ const UploadVideo = () => {
     formData.append("description", description);
     formData.append("videoFile", videoFile);
     formData.append("thumbnail", thumbnail);
+    formData.append("isPublished", isPublished);
 
     try {
       await axiosFormData.post("/videos", formData);
@@ -116,34 +118,90 @@ const UploadVideo = () => {
 
           {/* Video File Input */}
           <div className="mb-6">
-            <label htmlFor="videoFile" className="block text-gray-600 mb-2">
+            <label
+              htmlFor="videoFile"
+              className="block dark:text-gray-50 text-gray-600 mb-2"
+            >
               Upload Video
             </label>
+
+            <div className="flex items-center space-x-4">
+              <label
+                htmlFor="videoFile"
+                className="cursor-pointer inline-block text-sm font-semibold px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition"
+              >
+                Choose Video
+              </label>
+
+              <span className="text-sm text-gray-500 dark:text-white">
+                {videoFile ? videoFile.name : "No file chosen"}
+              </span>
+            </div>
+
             <input
               id="videoFile"
               type="file"
-              onChange={(e) => setVideoFile(e.target.files[0])}
-              className="block w-full text-sm dark:text-white  text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 transition duration-200"
               accept="video/*"
               required
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const sizeInMB = file.size / (1024 * 1024);
+                  if (sizeInMB > 100) {
+                    toast.error("File size exceeds limit: 100MB");
+                    setVideoFile(null);
+                    return;
+                  }
+                  setVideoFile(file);
+                }
+              }}
             />
           </div>
 
           {/* Thumbnail Input */}
+
           <div className="mb-6">
-            <label htmlFor="thumbnail" className="block text-gray-600 mb-2">
+            <label
+              htmlFor="thumbnail"
+              className="block dark:text-gray-50 text-gray-600 mb-2"
+            >
               Upload Thumbnail
             </label>
+
+            <div className="flex items-center space-x-4">
+              <label
+                htmlFor="thumbnail"
+                className="cursor-pointer inline-block text-sm font-semibold px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition"
+              >
+                Choose Thumbnail
+              </label>
+
+              <span className="text-sm text-gray-500 dark:text-white">
+                {thumbnail ? thumbnail.name : "No file chosen"}
+              </span>
+            </div>
+
             <input
               id="thumbnail"
               type="file"
-              onChange={(e) => setThumbnail(e.target.files[0])}
-              className="block w-full text-sm dark:text-white text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 transition duration-200"
               accept="image/*"
+              required
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const sizeInMB = file.size / (1024 * 1024);
+                  if (sizeInMB > 20) {
+                    toast.error("File size exceeds limit: 100MB");
+                    setThumbnail(null);
+                    return;
+                  }
+                  setThumbnail(file);
+                }
+              }}
             />
-            {/* Thumbnail Preview */}
           </div>
-
           {/* Submit Button */}
           <button
             type="submit"

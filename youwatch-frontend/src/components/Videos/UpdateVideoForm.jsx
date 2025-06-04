@@ -11,8 +11,9 @@ const VideoUpdateForm = () => {
   const [title, setTitle] = useState(video?.title || "");
   const [description, setDescription] = useState(video?.description || "");
   const [isPublished, setIsPublished] = useState(video?.isPublished || false);
-  const [thumbnail, setThumbnail] = useState(null);
+  const [thumbnail, setThumbnail] = useState(video?.thumbnail || null);
   const [loading, setLoading] = useState(false);
+  // console.log(video.thumbnail);
   const handleFileChange = (event) => {
     setThumbnail(event.target.files[0]);
   };
@@ -21,7 +22,11 @@ const VideoUpdateForm = () => {
     event.preventDefault();
 
     const formData = new FormData();
-    formData.append("thumbnail", thumbnail);
+    if (!thumbnail) {
+      formData.append("existingThumnailURL", video?.thumbnail);
+    } else {
+      formData.append("thumbnail", thumbnail);
+    }
     formData.append("title", title);
     formData.append("description", description);
     formData.append("isPublished", isPublished);
@@ -72,7 +77,7 @@ const VideoUpdateForm = () => {
             <input
               type="checkbox"
               checked={isPublished}
-              onChange={() => setIsPublished(!isPublished)}
+              onChange={(e) => setIsPublished(e.target.checked)}
               className="form-checkbox h-5 w-5 text-blue-600"
             />
           </div>
@@ -84,7 +89,6 @@ const VideoUpdateForm = () => {
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              required
               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0
                    file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
             />

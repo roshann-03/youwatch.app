@@ -10,16 +10,13 @@ import CustomVideoPlayer from "./CustomVideoPlayer";
 
 const VideoDetail = () => {
   const { id } = useParams();
-  const videoRef = useRef(null);
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(true);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
-  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLikedStatus = async (videoId) => {
     try {
@@ -145,9 +142,6 @@ const VideoDetail = () => {
     setIsDescriptionOpen(!isDescriptionOpen); // Toggle description visibility
   };
 
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-
   const formatSubscriberCount = (count) => {
     if (count >= 1) return `${count} subscriber`;
     if (count < 1000) return `${count} subscribers`;
@@ -182,24 +176,11 @@ const VideoDetail = () => {
     return `${seconds} second${seconds !== 1 ? "s" : ""} ago`;
   };
 
-  const handlePlayPause = () => {
-    const vid = videoRef.current;
-    if (!vid) return;
-
-    if (vid.paused) {
-      vid.play();
-      setIsPlaying(true);
-    } else {
-      vid.pause();
-      setIsPlaying(false);
-    }
-  };
-
   return (
     <div className="flex flex-col w-full justify-center items-center dark:bg-black dark:text-gray-50">
       <div className="relative w-full">
         <div className="video-container flex justify-center w-full dark:bg-black relative">
-          <CustomVideoPlayer video={ video } />
+          <CustomVideoPlayer video={video} />
         </div>
         <h1 className="text-2xl font-semibold px-5 mt-2">{video?.title}</h1>
         <div className="flex items-center px-5 mt-2 gap-10 cursor-pointer w-full">

@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 
 const VideoList = () => {
   const [videos, setVideos] = useState([]);
+  const [videoCount, setVideoCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,16 +28,28 @@ const VideoList = () => {
         {/* Video grid container */}
         <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
           {videos.length > 0 ? (
-            videos.map((video) => (
-              <div key={video?._id} className="w-full h-auto mx-auto  ">
-                {/* Ensure VideoCard takes full width on smaller screens */}
-                <VideoCard video={video} />
-              </div>
-            ))
+            videos.map(
+              (video) =>
+                video.isPublished && (
+                  <div key={video?._id} className="w-full h-auto mx-auto  ">
+                    {/* Ensure VideoCard takes full width on smaller screens */}
+                    <VideoCard video={video} />
+                    {setVideoCount((prev) => prev + 1)}
+                  </div>
+                )
+            )
           ) : (
             <div className="text-center text-black font-bold text-2xl">
               No videos found
             </div>
+          )}
+          
+          {videoCount === 0 ? (
+            <div className="text-center text-black font-bold text-2xl">
+              No videos found
+            </div>
+          ) : (
+            ""
           )}
         </div>
       </div>

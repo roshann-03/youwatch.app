@@ -17,6 +17,12 @@ export default function CustomVideoPlayer({ video }) {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
 
+  useEffect(() => {
+    const vid = videoRef.current;
+    vid.play();
+    setIsPlaying(true);
+  }, []);
+
   const togglePlay = () => {
     const vid = videoRef.current;
     if (vid.paused) {
@@ -164,6 +170,7 @@ export default function CustomVideoPlayer({ video }) {
         className="w-full h-auto bg-black"
         src={video.videoFile}
         onClick={togglePlay}
+        onPause={() => setIsPlaying(false)}
         controls={false}
       />
 

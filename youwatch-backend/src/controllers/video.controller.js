@@ -232,29 +232,27 @@ const updateVideo = asyncHandler(async (req, res) => {
   if (!isValidObjectId(videoId)) {
     return res.status(400).json(new ApiError(400, "Invalid video ID"));
   }
-  if (!req.user || !req.user._id) {
-    return res.status(401).json(new ApiError(401, "User is not authenticated"));
-  }
+
   const videoExists = await Video.exists({ _id: videoId });
+
   if (!videoExists) {
     return res.status(404).json(new ApiError(404, "Video not found"));
   }
   const thumbnailLocalPath = req.file?.path;
-  if (!thumbnailLocalPath) {
-    throw new ApiError(
-      400,
-      "thumbnailLocalPath Error: Thumbnail file is required"
-    );
-  }
-  const updateVideoThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
-  if (!updateVideoThumbnail) {
-    throw new ApiError(400, "Video file and thumbnail is required");
+  let updateVideoThumbnail = null;
+  if (thumbnailLocalPath) {
+    let updateVideoThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
+    if (!updateVideoThumbnail) {
+      throw new ApiError(400, "Video file and thumbnail is required");
+    }
+  } else {
+    updateVideoThumbnail = req.body?.existingThumbnailURL;
   }
   const video = await Video.findOneAndUpdate(
     { _id: videoId },
     {
       $set: {
-        thumbnail: updateVideoThumbnail?.secure_url,
+        thumbnail: updateVideoThumbnail?.secure_url || updateVideoThumbnail,
         title: req.body?.title,
         description: req.body?.description,
         isPublished: req.body?.isPublished,
