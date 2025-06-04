@@ -17,7 +17,6 @@
   "license": "ISC",
   "dependencies": {
     "@adminjs/bundler": "^3.0.0",
-    "@adminjs/design-system": "^4.1.1",
     "@adminjs/express": "^6.1.1",
     "@adminjs/mongoose": "^4.1.0",
     "adminjs": "^7.8.16",
@@ -29,6 +28,7 @@
     "express": "^4.21.2",
     "express-formidable": "^1.2.0",
     "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1",
     "google-auth-library": "^9.15.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.0",
