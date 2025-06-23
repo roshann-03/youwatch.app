@@ -17,16 +17,15 @@ const VideoUpdateForm = () => {
   const handleFileChange = (event) => {
     setThumbnail(event.target.files[0]);
   };
-
+  // console.log(thumbnail);
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     const formData = new FormData();
-    if (!thumbnail) {
-      formData.append("existingThumnailURL", video?.thumbnail);
-    } else {
+    if (thumbnail) {
       formData.append("thumbnail", thumbnail);
     }
+    formData.append("existingThumnailURL", video?.thumbnail);
     formData.append("title", title);
     formData.append("description", description);
     formData.append("isPublished", isPublished);

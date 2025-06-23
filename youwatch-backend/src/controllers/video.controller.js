@@ -13,7 +13,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
     query,
     sortBy = "createdAt",
     sortType = "desc",
-    userId,
   } = req.query;
 
   // Validate pagination options
@@ -73,7 +72,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
   // Paginate the results
   const videos = await Video.aggregatePaginate(aggregateVideos, options);
-
   if (!videos || videos.length === 0) {
     return res.status(404).json(new ApiError(404, "No videos found"));
   }
@@ -241,18 +239,17 @@ const updateVideo = asyncHandler(async (req, res) => {
   const thumbnailLocalPath = req.file?.path;
   let updateVideoThumbnail = null;
   if (thumbnailLocalPath) {
-    let updateVideoThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
+    updateVideoThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
     if (!updateVideoThumbnail) {
-      throw new ApiError(400, "Video file and thumbnail is required");
+      throw new ApiError(400, "Couldn't update thumbnail");
     }
-  } else {
-    updateVideoThumbnail = req.body?.existingThumbnailURL;
   }
   const video = await Video.findOneAndUpdate(
     { _id: videoId },
     {
       $set: {
-        thumbnail: updateVideoThumbnail?.secure_url || updateVideoThumbnail,
+        thumbnail:
+          updateVideoThumbnail?.secure_url || req.body?.existingThumnailURL,
         title: req.body?.title,
         description: req.body?.description,
         isPublished: req.body?.isPublished,
@@ -390,7 +387,7 @@ const getLikesByVideoId = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, video[0], "Video fetched"));
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json(new ApiError(500, "Internal server error"));
   }
 });

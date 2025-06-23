@@ -104,9 +104,7 @@ const loginUser = asyncHandler(async (req, res) => {
     ],
   });
 
-  if (user?.isGoogleUser) {
-    throw new ApiError(404, "Please log in using Google for this account.");
-  } else if (!user) {
+  if (!user) {
     throw new ApiError(404, "User does not exist");
   }
   // Validate password
@@ -459,10 +457,9 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 });
 
 const setPasswordController = asyncHandler(async (req, res) => {
-  const { userId, password } = req.body;
-
+  const { username, password } = req.body;
   try {
-    const user = await User.findById(userId);
+    const user = await User.findOne({ username: username });
     user.password = password;
     await user.save({ validateBeforeSave: false });
     return res

@@ -24,7 +24,6 @@ export const googleAuthController = asyncHandler(async (req, res) => {
 
     const payload = ticket.getPayload();
     const { email, name, picture, email_verified } = payload;
-
     // If email is not verified, throw an error
     if (!email_verified) {
       throw new ApiError(403, "Email not verified by Google");
@@ -60,6 +59,7 @@ export const googleAuthController = asyncHandler(async (req, res) => {
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
       user._id
     );
+    console.log(user.avatar);
 
     // Send tokens as HTTP-only cookies
     const options = {
@@ -67,7 +67,6 @@ export const googleAuthController = asyncHandler(async (req, res) => {
       secure: process.env.NODE_ENV === "production", // Set to true only for production,
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
     };
-
     res
       .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", refreshToken, options)

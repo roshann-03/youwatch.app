@@ -18,7 +18,7 @@ import {
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+// import { asyncHandler } from "../utils/asyncHandler.js";
 import { googleAuthController } from "../controllers/googleauth.controller.js";
 
 const router = Router(); //make an instance of Router();
@@ -48,7 +48,7 @@ router.route("/register").post(
 
 router.route("/login").post(loginUser);
 
-router.get("/status", (req, res) => {
+router.get("/status", verifyJWT, (req, res) => {
   // Check if user is authenticated by verifying cookies
   if (req.cookies.accessToken) {
     return res.status(200).json({ message: "User is logged in" });

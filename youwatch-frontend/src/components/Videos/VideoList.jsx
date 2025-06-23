@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import VideoCard from "./VideoCard";
 import { axiosJSON } from "../../api/axiosInstances";
-import { Navigate, useNavigate } from "react-router-dom";
 
 const VideoList = () => {
   const [videos, setVideos] = useState([]);
   const [videoCount, setVideoCount] = useState(0);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchVideos = async () => {

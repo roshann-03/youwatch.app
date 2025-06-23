@@ -22,9 +22,9 @@ const SetPassword = () => {
     try {
       setLoading(true);
       const user = JSON.parse(localStorage.getItem("user"));
-      const userId = user._id;
+      const username = user.username;
       const response = await axiosJSON.post("/users/set-password", {
-        userId,
+        username,
         password,
       });
       if (response.status === 200) {
