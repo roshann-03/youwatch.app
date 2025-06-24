@@ -4,12 +4,18 @@ import { toast } from "react-toastify";
 import { axiosJSON } from "../../api/axiosInstances";
 import DeleteModal from "../Modals/DeleteModal";
 
-const VideoCard = ({ video, isOptions = false, onDeleteSuccess }) => {
+const VideoCard = ({
+  video,
+  isOptions = false,
+  openOptionsId,
+  setOpenOptionsId,
+  onDeleteSuccess,
+}) => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
   const [videoToDelete, setVideoToDelete] = useState(null); // Video to delete
-  const [openOptionsId, setOpenOptionsId] = useState(null); // Track which video's options are open
-  // console.log(video);
+  // const [openOptionsId, setOpenOptionsId] = useState(null); // Track which video's options are open
+
   const optionsRef = useRef(null); // Reference for options button
 
   const notify = (message) => toast(message);
@@ -46,14 +52,10 @@ const VideoCard = ({ video, isOptions = false, onDeleteSuccess }) => {
     navigate(`/video/${video?._id}`);
     window.scrollTo(0, 0);
   };
-
-  const videoTitleTruncate = (title) => {
-    if (title.split(" ").length > 10) {
-      return title.split(" ").splice(0, 10).join(" ") + "...";
-    } else {
-      return title;
-    }
-  };
+  const videoTitleTruncate = (title = "") =>
+    title.split(" ").length > 10
+      ? title.split(" ").slice(0, 10).join(" ") + "..."
+      : title;
 
   const handleOptions = (e) => {
     e.stopPropagation();
@@ -140,7 +142,7 @@ const VideoCard = ({ video, isOptions = false, onDeleteSuccess }) => {
               {videoTitleTruncate(video?.title)}
             </h3>
             <p className="dark:text-gray-200 text-gray-600 text-sm">
-              @{video?.owner?.name || video?.owner?.username}
+              @{video?.owner?.name ?? video?.owner?.username ?? "Unknown"}
             </p>
             <p className="text-sm font-medium dark:text-white text-gray-600">
               {video?.views} views • {timeAgo(video?.createdAt)}

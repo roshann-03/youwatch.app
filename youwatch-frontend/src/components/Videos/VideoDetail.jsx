@@ -46,7 +46,7 @@ const VideoDetail = () => {
   };
   useEffect(() => {
     handleLikedStatus(id);
-  }, []);
+  }, [id]);
 
   const fetchVideoLikes = async () => {
     try {
@@ -59,7 +59,7 @@ const VideoDetail = () => {
 
   useEffect(() => {
     fetchVideoLikes();
-  }, []);
+  }, [id]);
 
   const toggleLike = async (videoId) => {
     try {
@@ -81,14 +81,6 @@ const VideoDetail = () => {
 
   const handleLike = () => {
     toggleLike(id);
-    if (isLiked) {
-      setIsLiked(false);
-    } else {
-      if (isDisliked) {
-        setIsDisliked(false);
-      }
-      setIsLiked(true);
-    }
   };
 
   const handleDislike = () => {
@@ -114,19 +106,30 @@ const VideoDetail = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchVideoDetails = async () => {
       try {
         const response = await axiosJSON.get(`videos/${id}`);
-        setVideo(response?.data.data);
+        if (isMounted) {
+          setVideo(response?.data.data);
+        }
       } catch (err) {
-        console.error("Error fetching video details:", err);
-        setError("Failed to fetch video details.");
+        if (isMounted) {
+          setError("Failed to fetch video details.");
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchVideoDetails();
+
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
   if (loading) return <div>Loading...</div>;

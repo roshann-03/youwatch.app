@@ -19,8 +19,20 @@ export default function CustomVideoPlayer({ video }) {
 
   useEffect(() => {
     const vid = videoRef.current;
-    vid.play();
-    setIsPlaying(true);
+    if (!vid) return;
+
+    // Attempt autoplay with safe fallback
+    const attemptPlay = async () => {
+      try {
+        await vid.play();
+        setIsPlaying(true);
+      } catch (err) {
+        console.warn("Autoplay failed, user interaction required", err);
+        setIsPlaying(false);
+      }
+    };
+
+    attemptPlay();
   }, []);
 
   const togglePlay = () => {
@@ -153,7 +165,7 @@ export default function CustomVideoPlayer({ video }) {
     };
   }, [video._id]);
 
-  const formatTime = (time) => {
+  const formatTime = (time = 0) => {
     const minutes = Math.floor(time / 60)
       .toString()
       .padStart(2, "0");
@@ -178,9 +190,9 @@ export default function CustomVideoPlayer({ video }) {
         <input
           type="range"
           min={0}
-          max={duration}
+          max={duration || 0}
           step={0.1}
-          value={progress}
+          value={progress || 0}
           onChange={handleProgress}
           className="w-full h-1 accent-gray-200"
         />
