@@ -11,7 +11,6 @@ const VideoList = () => {
       try {
         const response = await axiosJSON.get(`/videos`);
         const videoData = response?.data.data.docs;
-        console.log(videoData);
         setVideos(videoData);
       } catch (error) {
         setVideos([]);
