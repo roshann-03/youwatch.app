@@ -9,7 +9,7 @@ const VideoCard = ({ video, isOptions = false, onDeleteSuccess }) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
   const [videoToDelete, setVideoToDelete] = useState(null); // Video to delete
   const [openOptionsId, setOpenOptionsId] = useState(null); // Track which video's options are open
-
+  // console.log(video);
   const optionsRef = useRef(null); // Reference for options button
 
   const notify = (message) => toast(message);
