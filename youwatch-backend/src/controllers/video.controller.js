@@ -22,16 +22,18 @@ const getAllVideos = asyncHandler(async (req, res) => {
   };
 
   // Prepare regex query if query exists
-  let matchStage = {};
+  let matchStage = { isPublished: true };
   if (query && typeof query === "string" && query.trim()) {
-    matchStage = {
-      $or: [
-        { title: { $regex: query.trim(), $options: "i" } },
-        { description: { $regex: query.trim(), $options: "i" } },
-      ],
-    };
+    matchStage.$and = [
+      { isPublished: true }, // necessary if you’re using $and
+      {
+        $or: [
+          { title: { $regex: query.trim(), $options: "i" } },
+          { description: { $regex: query.trim(), $options: "i" } },
+        ],
+      },
+    ];
   }
-
   const aggregateVideos = Video.aggregate([
     { $match: matchStage },
     {

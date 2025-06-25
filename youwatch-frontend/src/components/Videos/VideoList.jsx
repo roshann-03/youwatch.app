@@ -4,7 +4,6 @@ import { axiosJSON } from "../../api/axiosInstances";
 
 const VideoList = () => {
   const [videos, setVideos] = useState([]);
-  const [openOptionsId, setOpenOptionsId] = useState(null);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -16,33 +15,23 @@ const VideoList = () => {
         setVideos([]);
       }
     };
-
     fetchVideos();
   }, []);
 
-  const handleDeleteSuccess = (deletedId) => {
-    setVideos((prev) => prev.filter((v) => v._id !== deletedId));
-  };
-
-  const publishedVideos = videos.filter((video) => video.isPublished);
-
   return (
-    <div className="w-full min-h-screen bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900">
+    <div className="w-full  min-h-screen bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900">
       <div className="w-full min-h-screen p-4 bg-opacity-90 dark:bg-gradient-to-b from-gray-800 to-black bg-white dark:text-white shadow-xl">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
-          {publishedVideos.length > 0 ? (
-            publishedVideos.map((video) => (
-              <div key={video._id} className="w-full h-auto mx-auto">
-                <VideoCard
-                  video={video}
-                  openOptionsId={openOptionsId}
-                  setOpenOptionsId={setOpenOptionsId}
-                  onDeleteSuccess={handleDeleteSuccess}
-                />
+        {/* Video grid container */}
+        <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
+          {videos.length > 0 ? (
+            videos.map((video) => (
+              <div key={video?._id} className="w-full h-auto mx-auto  ">
+                {/* Ensure VideoCard takes full width on smaller screens */}
+                <VideoCard video={video} />
               </div>
             ))
           ) : (
-            <div className="text-center text-black font-bold text-2xl col-span-full">
+            <div className="text-center text-black font-bold text-2xl">
               No videos found
             </div>
           )}

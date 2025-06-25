@@ -10,7 +10,6 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const googleAuthController = asyncHandler(async (req, res) => {
   const { idToken } = req.body;
-
   if (!idToken) {
     throw new ApiError(400, "Google ID token is required");
   }

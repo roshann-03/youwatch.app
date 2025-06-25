@@ -4,18 +4,12 @@ import { toast } from "react-toastify";
 import { axiosJSON } from "../../api/axiosInstances";
 import DeleteModal from "../Modals/DeleteModal";
 
-const VideoCard = ({
-  video,
-  isOptions = false,
-  openOptionsId,
-  setOpenOptionsId,
-  onDeleteSuccess,
-}) => {
+const VideoCard = ({ video, isOptions = false }) => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
   const [videoToDelete, setVideoToDelete] = useState(null); // Video to delete
-  // const [openOptionsId, setOpenOptionsId] = useState(null); // Track which video's options are open
-
+  const [openOptionsId, setOpenOptionsId] = useState(null); // Track which video's options are open
+  // console.log(video);
   const optionsRef = useRef(null); // Reference for options button
 
   const notify = (message) => toast(message);
@@ -52,10 +46,14 @@ const VideoCard = ({
     navigate(`/video/${video?._id}`);
     window.scrollTo(0, 0);
   };
-  const videoTitleTruncate = (title = "") =>
-    title.split(" ").length > 10
-      ? title.split(" ").slice(0, 10).join(" ") + "..."
-      : title;
+
+  const videoTitleTruncate = (title) => {
+    if (title.split(" ").length > 10) {
+      return title.split(" ").splice(0, 10).join(" ") + "...";
+    } else {
+      return title;
+    }
+  };
 
   const handleOptions = (e) => {
     e.stopPropagation();
@@ -80,9 +78,9 @@ const VideoCard = ({
       // Close modal after deletion
       setIsModalOpen(false);
       // Trigger parent component's delete success handler
-      if (onDeleteSuccess) {
-        onDeleteSuccess(videoToDelete._id);
-      }
+      // if (onDeleteSuccess) {
+      //   onDeleteSuccess(videoToDelete._id);
+      // }
     } catch (error) {
       console.error("Error deleting video", error);
       notify("Failed to delete video");
@@ -142,7 +140,7 @@ const VideoCard = ({
               {videoTitleTruncate(video?.title)}
             </h3>
             <p className="dark:text-gray-200 text-gray-600 text-sm">
-              @{video?.owner?.name ?? video?.owner?.username ?? "Unknown"}
+              @{video?.owner?.name || video?.owner?.username}
             </p>
             <p className="text-sm font-medium dark:text-white text-gray-600">
               {video?.views} views • {timeAgo(video?.createdAt)}
@@ -152,7 +150,7 @@ const VideoCard = ({
               <div
                 onClick={(e) => handleOptions(e)}
                 className="absolute top-2 right-2 text-gray-400 hover:text-gray-300"
-                ref={optionsRef}
+                // ref={optionsRef}
               >
                 <svg
                   id={video?._id}
