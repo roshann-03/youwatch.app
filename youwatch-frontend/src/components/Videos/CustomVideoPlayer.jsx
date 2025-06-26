@@ -20,18 +20,14 @@ export default function CustomVideoPlayer({ video }) {
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
-
-    // Attempt autoplay with safe fallback
     const attemptPlay = async () => {
       try {
         await vid.play();
         setIsPlaying(true);
-      } catch (err) {
-        console.warn("Autoplay failed, user interaction required", err);
+      } catch {
         setIsPlaying(false);
       }
     };
-
     attemptPlay();
   }, []);
 
@@ -122,7 +118,6 @@ export default function CustomVideoPlayer({ video }) {
     };
   }, [duration]);
 
-  // ✅ Improved View Tracking (actual watched time)
   useEffect(() => {
     const vid = videoRef.current;
     let watchedTime = 0;
@@ -131,7 +126,6 @@ export default function CustomVideoPlayer({ video }) {
 
     const trackWatchTime = () => {
       const currentTime = vid.currentTime;
-      // Only count if it's a natural progression (not skip)
       if (Math.abs(currentTime - lastTime) < 1.2) {
         watchedTime += 1;
       }
@@ -176,35 +170,54 @@ export default function CustomVideoPlayer({ video }) {
   };
 
   return (
-    <div className="video-container relative w-full max-w-4xl mx-auto bg-black overflow-hidden shadow-lg">
+    <div
+      className="relative w-full max-w-4xl mx-auto overflow-hidden rounded-xl
+        bg-white shadow-lg dark:bg-[#0b0f1c] dark:shadow-[0_0_20px_#00fff7]"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
       <video
         ref={videoRef}
-        className="w-full h-auto bg-black"
+        className="w-full h-auto cursor-pointer bg-black"
         src={video.videoFile}
         onClick={togglePlay}
         onPause={() => setIsPlaying(false)}
         controls={false}
       />
 
-      <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-md text-white p-4 flex flex-col gap-2">
+      <div
+        className="absolute bottom-0 w-full backdrop-blur-md p-4
+        bg-white/70  dark:bg-black/60 border-t
+        border-gray-200 dark:border-cyan-500 text-gray-800 dark:text-cyan-300"
+      >
+        {/* Progress Bar */}
         <input
           type="range"
           min={0}
           max={duration || 0}
           step={0.1}
-          value={progress || 0}
+          value={progress}
           onChange={handleProgress}
-          className="w-full h-1 accent-gray-200"
+          className="w-full h-1 rounded-lg appearance-none cursor-pointer accent-indigo-400
+            bg-gradient-to-r from-indigo-300 to-purple-300 dark:bg-cyan-800 dark:accent-cyan-300"
         />
 
-        <div className="flex justify-between items-center gap-4">
+        <div className="flex justify-between items-center mt-3">
+          {/* Left Controls */}
           <div className="flex gap-4 items-center">
-            <button onClick={togglePlay} className="text-xl">
+            <button
+              onClick={togglePlay}
+              className="text-xl p-2 rounded-full transition hover:bg-indigo-100 dark:hover:bg-cyan-900"
+            >
               {isPlaying ? <FaPause /> : <FaPlay />}
             </button>
-            <button onClick={toggleMute} className="text-xl">
+
+            <button
+              onClick={toggleMute}
+              className="text-xl p-2 rounded-full transition hover:bg-indigo-100 dark:hover:bg-cyan-900"
+            >
               {isMuted || volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
             </button>
+
             <input
               type="range"
               min={0}
@@ -212,16 +225,19 @@ export default function CustomVideoPlayer({ video }) {
               step={0.01}
               value={volume}
               onChange={handleVolume}
-              className="volume-slider w-32 h-1 rounded-full bg-gray-500/30 accent-gray-200"
+              className="w-24 h-1 rounded-lg appearance-none accent-indigo-400 bg-gray-300 dark:bg-cyan-800"
             />
-            <div className="flex justify-between text-xs text-white/80 px-1">
-              <span>{formatTime(progress)}</span>{" "}
-              <span className="px-1"> / </span>
-              <span>{formatTime(duration)}</span>
+
+            <div className="text-sm text-gray-600 dark:text-cyan-200 font-mono select-none">
+              {formatTime(progress)} / {formatTime(duration)}
             </div>
           </div>
 
-          <button onClick={toggleFullscreen} className="text-xl">
+          {/* Fullscreen Button */}
+          <button
+            onClick={toggleFullscreen}
+            className="text-xl p-2 rounded-full transition hover:bg-indigo-100 dark:hover:bg-cyan-900"
+          >
             <FaExpand />
           </button>
         </div>

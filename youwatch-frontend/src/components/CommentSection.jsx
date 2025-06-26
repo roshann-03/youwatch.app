@@ -12,6 +12,25 @@ const CommentSection = () => {
   const { id } = useParams();
   const user = JSON.parse(localStorage.getItem("user"));
   const [hasNextPage, setHasNextPage] = useState(null);
+  const [showOptions, setShowOptions] = useState(null);
+
+  useEffect(() => {
+    loadInitialComments();
+  }, []);
+
+  const loadMoreComments = async () => {
+    if (!comments.length) return;
+
+    if (!hasNextPage) {
+      setPage(1);
+      loadInitialComments(); // Reset to first page
+      return;
+    }
+
+    const moreComments = await fetchComments(page);
+    setComments((prev) => [...prev, ...moreComments]);
+    setPage((prev) => prev + 1);
+  };
 
   const fetchComments = async (currentPage) => {
     try {
@@ -37,34 +56,62 @@ const CommentSection = () => {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    const newComment = { content: comment };
-
     try {
-      const response = await axiosJSON.post(`/comments/${id}`, newComment);
-      setComments((prevComments) => [
-        ...prevComments,
+      const response = await axiosJSON.post(`/comments/${id}`, {
+        content: comment,
+      });
+      setComments((prev) => [
+        ...prev,
         { ...response.data.data, isLiked: false },
-      ]); // Initialize isLiked
+      ]);
       setComment("");
     } catch (error) {
-      console.error("Failed to post comment:", error);
+      console.error("Submit error:", error);
     }
   };
 
-  useEffect(() => {
-    loadInitialComments();
-  }, []);
-
-  const loadMoreComments = async () => {
-    if (!comments.length) return;
-    if (!hasNextPage) {
-      setPage(1);
-      loadInitialComments();
-      return;
+  const handleEditComment = async (e, videoId, commentId) => {
+    e.preventDefault();
+    try {
+      const response = await axiosJSON.patch(
+        `/comments/c/${videoId}/${commentId}`,
+        {
+          content: editingCommentContent,
+        }
+      );
+      setComments((prev) =>
+        prev.map((c) => (c._id === commentId ? response.data.data : c))
+      );
+      setEditingCommentId(null);
+      setEditingCommentContent("");
+    } catch (error) {
+      console.error("Edit error:", error);
     }
-    const moreComments = await fetchComments(page);
-    setComments((prevComments) => [...prevComments, ...moreComments]);
-    setPage((prev) => prev + 1);
+  };
+
+  const handleDeleteComment = async (videoId, commentId) => {
+    try {
+      await axiosJSON.delete(`/comments/c/${videoId}/${commentId}`);
+      setComments((prev) => prev.filter((c) => c._id !== commentId));
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
+  };
+
+  const toggleLikeComment = async (commentId) => {
+    try {
+      const response = await axiosJSON.post(`/likes/toggle/c/${commentId}`, {});
+      const isLiked = response.data.data.isLiked;
+      setComments((prev) =>
+        prev.map((c) => (c._id === commentId ? { ...c, isLiked } : c))
+      );
+    } catch (error) {
+      console.error("Like toggle error:", error);
+    }
+  };
+
+  const toggleOptions = (commentId) => {
+    setShowOptions((prev) => (prev === commentId ? null : commentId));
   };
 
   const timeAgo = (date) => {
@@ -89,198 +136,146 @@ const CommentSection = () => {
     return `${(count / 1000000).toFixed(1)}m Comments`;
   };
 
-  const handleEditComment = async (e, videoId, commentId) => {
-    e.preventDefault();
-    const updatedComment = { content: editingCommentContent };
-
-    try {
-      const response = await axiosJSON.patch(
-        `/comments/c/${videoId}/${commentId}`,
-        updatedComment
-      );
-      setComments((prevComments) =>
-        prevComments.map((c) => (c._id === commentId ? response.data.data : c))
-      );
-      setEditingCommentId(null);
-      setEditingCommentContent("");
-    } catch (error) {
-      console.error("Failed to edit comment:", error);
-    }
-  };
-
-  const handleDeleteComment = async (videoId, commentId) => {
-    try {
-      await axiosJSON.delete(`/comments/c/${videoId}/${commentId}`);
-      setComments((prevComments) =>
-        prevComments.filter((c) => c._id !== commentId)
-      );
-    } catch (error) {
-      console.error("Failed to delete comment:", error);
-    }
-  };
-
-  const toggleLikeComment = async (commentId) => {
-    try {
-      const response = await axiosJSON.post(
-        `/likes/toggle/c/${commentId}`,
-        {},
-        { withCredentials: true }
-      );
-
-      const isLiked = response.data.data.isLiked; // Assuming this is the response structure
-      // Update the comments state to reflect the new like status
-      setComments((prevComments) =>
-        prevComments.map(
-          (c) => (c._id === commentId ? { ...c, isLiked } : c) // Add isLiked without losing other data
-        )
-      );
-    } catch (error) {
-      console.error("Failed to toggle like:", error);
-    }
-  };
-  useEffect(() => {
-    const isLikedOnComment = () => {};
-  });
-  const [showOptions, setShowOptions] = useState(null); // Track which comment's options to show
-
-  const toggleOptions = (commentId) => {
-    setShowOptions((prev) => (prev === commentId ? null : commentId));
-  };
-
   return (
-    <div className="mt-4 items-center  justify-center px-5">
+    <div className="mt-4 items-center justify-center px-5">
       <div className="rounded px-5">
-        <p className="text-xl dark:text-gray-50 font-medium mb-5 ">
+        <p className="text-xl dark:text-cyan-400 font-semibold mb-5 text-gray-800">
           {formatCommentsCount(comments.length)}
         </p>
-        <div className="flex items-center w-full">
-          <div className="user-img  w-14 rounded-full object-cover object-center">
-            <img
-              src={user.avatar}
-              alt={user.username}
-              className="w-full h-full rounded-full mr-2"
-            />
-          </div>
-          <form
-            onSubmit={handleCommentSubmit}
-            className="flex ml-2 mb-4 w-full"
-          >
+
+        {/* Comment Input */}
+        <div className="flex items-center w-full mb-6">
+          <img
+            src={user.avatar}
+            alt={user.username}
+            className="w-12 h-12 rounded-full mr-4"
+          />
+          <form onSubmit={handleCommentSubmit} className="flex-grow">
             <input
               type="text"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className="border-b-[1px] outline-none border-zinc-400 p-2 flex-grow bg-transparent"
               placeholder="Add a comment..."
+              className="w-full border-b-2 p-2 bg-transparent dark:border-cyan-500 border-gray-400 text-gray-900 dark:text-white focus:outline-none"
               required
             />
           </form>
         </div>
 
-        <ul className="mt-2 flex flex-col gap-5">
-          {comments.length === 0 && <li>No comments yet</li>}
+        {/* Comment List */}
+        <ul className="space-y-6">
           {comments.map((c) => (
-            <li key={c._id} className="flex items-start p-5">
-              <img
-                src={c.owner.avatar}
-                alt={c.owner.username}
-                className="w-10 h-10 rounded-full mr-2"
-              />
-              <div className="flex flex-col relative">
-                <div className="flex gap-2 items-center mb-1">
-                  <p className="font-semibold">@{c.owner.username}</p>
-                  <p className="text-sm dark:text-gray-300 tracking-tight">
-                    {timeAgo(c.createdAt)}
-                  </p>
-                  {user._id === c.owner._id && (
-                    <button
-                      onClick={() => toggleOptions(c._id)}
-                      className="dark:text-gray-300 text-xl font-bold ml-3 hover:text-gray-400 focus:outline-none"
-                    >
-                      ⋮
-                    </button>
-                  )}
-                  {showOptions === c._id && (
-                    <div className="absolute right-3 top-5 bg-gray-800 rounded shadow-lg p-2">
-                      <button
-                        onClick={() => {
-                          setEditingCommentId(c._id);
-                          setEditingCommentContent(c.content);
-                          setShowOptions(null); // Close options after clicking
-                        }}
-                        className="block w-full text-yellow-600 hover:text-yellow-400"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleDeleteComment(id, c._id);
-                          setShowOptions(null); // Close options after clicking
-                        }}
-                        className="block w-full text-red-600 hover:text-red-400"
-                      >
-                        Delete
-                      </button>
+            <li
+              key={c._id}
+              className="relative p-5 rounded-xl bg-white text-gray-800 dark:bg-[#0b1120] dark:text-gray-100 dark:border dark:border-cyan-700 shadow-md dark:shadow-[0_0_12px_#00ffee22] transition-all"
+            >
+              <div className="flex items-start space-x-4">
+                <img
+                  src={c.owner.avatar}
+                  alt={c.owner.username}
+                  className="w-10 h-10 rounded-full"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-2 items-center">
+                      <p className="font-semibold text-sm">
+                        @{c.owner.username}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {timeAgo(c.createdAt)}
+                      </p>
                     </div>
-                  )}
-                </div>
+                    {user._id === c.owner._id && (
+                      <button
+                        onClick={() => toggleOptions(c._id)}
+                        className="text-xl text-cyan-400 hover:text-cyan-300"
+                      >
+                        ⋮
+                      </button>
+                    )}
+                  </div>
 
-                {editingCommentId === c._id ? (
-                  <form
-                    onSubmit={(e) => {
-                      handleEditComment(e, id, c._id);
-                    }}
-                  >
-                    <input
-                      type="text"
-                      value={editingCommentContent}
-                      onChange={(e) => setEditingCommentContent(e.target.value)}
-                      className="border-b-[1px] outline-none border-zinc-400 p-2 bg-transparent"
-                      required
-                    />
-                    <div className="flex gap-2 mt-2">
-                      <button type="submit" className="text-blue-500">
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingCommentId(null);
-                          setEditingCommentContent("");
-                        }}
-                        className="text-blue-500"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <>
-                    <p className="dark:text-gray-200 max-w-md break-words">
-                      {c.content}
-                    </p>
-                    <div className="flex gap-2">
-                      <button onClick={() => toggleLikeComment(c._id)}>
-                        {c.isLiked ? <BiSolidLike /> : <BiLike />}
-                      </button>
-                    </div>
-                  </>
-                )}
+                  {editingCommentId === c._id ? (
+                    <form
+                      onSubmit={(e) => handleEditComment(e, id, c._id)}
+                      className="mt-2"
+                    >
+                      <input
+                        type="text"
+                        value={editingCommentContent}
+                        onChange={(e) =>
+                          setEditingCommentContent(e.target.value)
+                        }
+                        className="w-full border-b border-cyan-500 bg-transparent text-white focus:outline-none p-1"
+                        required
+                      />
+                      <div className="flex gap-3 mt-2 text-sm">
+                        <button type="submit" className="text-cyan-400">
+                          Save
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingCommentId(null);
+                            setEditingCommentContent("");
+                          }}
+                          className="text-gray-400"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <p className="mt-2 text-sm break-words">{c.content}</p>
+                  )}
+
+                  <div className="mt-3 flex items-center gap-3">
+                    <button
+                      onClick={() => toggleLikeComment(c._id)}
+                      className="text-xl text-cyan-300 hover:scale-110 transition-transform"
+                    >
+                      {c.isLiked ? <BiSolidLike /> : <BiLike />}
+                    </button>
+                  </div>
+                </div>
               </div>
+
+              {showOptions === c._id && (
+                <div className="absolute top-5 right-5 bg-[#1f2937] border border-cyan-600 text-sm rounded-md shadow-md p-2 space-y-1">
+                  <button
+                    onClick={() => {
+                      setEditingCommentId(c._id);
+                      setEditingCommentContent(c.content);
+                      setShowOptions(null);
+                    }}
+                    className="block text-yellow-400 hover:text-yellow-300"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleDeleteComment(id, c._id);
+                      setShowOptions(null);
+                    }}
+                    className="block text-red-500 hover:text-red-400"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
             </li>
           ))}
-          <li>
-            <button
-              onClick={loadMoreComments}
-              className="text-blue-500 mt-2"
-              disabled={comments.length === 0}
-            >
-              {!hasNextPage && comments.length >= 10
-                ? "Show less"
-                : comments.length >= 10
-                ? "Load more comments"
-                : ""}
-            </button>
-          </li>
+
+          {/* Load More Button */}
+          {comments.length > 0 && (
+            <li>
+              <button
+                onClick={loadMoreComments}
+                className="mt-4 text-cyan-600 hover:underline"
+              >
+                {hasNextPage ? "Load more comments" : "Show less"}
+              </button>
+            </li>
+          )}
         </ul>
       </div>
     </div>

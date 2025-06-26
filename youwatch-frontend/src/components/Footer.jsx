@@ -4,23 +4,24 @@ import {
   FaTwitter,
   FaInstagram,
   FaGithub,
-  FaLinkedin,
   FaLinkedinIn,
-} from "react-icons/fa"; // Import the icons
+} from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-gray-800 dark:bg-gray-900 text-gray-100 dark:text-gray-300 py-8">
+    <footer className="w-full bg-[#F8FAFC] dark:bg-[#0a0f1c] text-[#0f172a] dark:text-[#F1F5F9] py-10 border-t border-[#E5E7EB] dark:border-[#1f2937] font-sans dark:font-futuristic">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Section 1: Quick Links */}
           <div>
-            <h4 className="text-xl font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-xl font-semibold mb-4 text-[#3A86FF] dark:text-[#00FFF7]">
+              Quick Links
+            </h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/"
-                  className="hover:text-amber-500 transition duration-300"
+                  className="hover:text-[#FF006E] dark:hover:text-[#FF00A8] transition duration-300"
                 >
                   Home
                 </Link>
@@ -28,7 +29,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/"
-                  className="hover:text-amber-500 transition duration-300"
+                  className="hover:text-[#FF006E] dark:hover:text-[#FF00A8] transition duration-300"
                 >
                   Explore
                 </Link>
@@ -36,7 +37,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/my-videos"
-                  className="hover:text-amber-500 transition duration-300"
+                  className="hover:text-[#FF006E] dark:hover:text-[#FF00A8] transition duration-300"
                 >
                   My Videos
                 </Link>
@@ -44,7 +45,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/upload"
-                  className="hover:text-amber-500 transition duration-300"
+                  className="hover:text-[#FF006E] dark:hover:text-[#FF00A8] transition duration-300"
                 >
                   Upload Video
                 </Link>
@@ -54,8 +55,10 @@ const Footer = () => {
 
           {/* Section 2: About Us */}
           <div>
-            <h4 className="text-xl font-semibold mb-4">About Us</h4>
-            <p className="text-sm">
+            <h4 className="text-xl font-semibold mb-4 text-[#3A86FF] dark:text-[#00FFF7]">
+              About Us
+            </h4>
+            <p className="text-sm text-[#475569] dark:text-[#94a3b8]">
               YouWatch is a platform where you can explore, upload, and share
               amazing videos with the world. Join our community and share your
               creative content today!
@@ -64,35 +67,37 @@ const Footer = () => {
 
           {/* Section 3: Social Media */}
           <div>
-            <h4 className="text-xl font-semibold mb-4">Follow Us</h4>
+            <h4 className="text-xl font-semibold mb-4 text-[#3A86FF] dark:text-[#00FFF7]">
+              Follow Us
+            </h4>
             <div className="flex gap-4">
               <Link
                 to="https://github.com/roshann-03"
                 target="_blank"
-                className="text-gray-300 hover:text-gray-500 transition duration-300"
+                className="text-[#0f172a] dark:text-[#F1F5F9] hover:text-[#3A86FF] dark:hover:text-[#00FFF7] transition duration-300"
               >
-                <FaGithub size={24} /> {/* Facebook icon */}
+                <FaGithub size={24} />
               </Link>
               <Link
                 to="https://www.linkedin.com/in/roshan-shaikh-7a5428342/"
                 target="_blank"
-                className="text-gray-300 hover:text-sky-400 transition duration-300"
+                className="text-[#0f172a] dark:text-[#F1F5F9] hover:text-[#3A86FF] dark:hover:text-[#00FFF7] transition duration-300"
               >
-                <FaLinkedinIn size={24} /> {/* Twitter icon */}
+                <FaLinkedinIn size={24} />
               </Link>
               <Link
                 to="https://www.instagram.com/roshanshaikh.developer/"
                 target="_blank"
-                className="text-gray-300 hover:text-pink-500 transition duration-300"
+                className="text-[#0f172a] dark:text-[#F1F5F9] hover:text-[#FF006E] dark:hover:text-[#FF00A8] transition duration-300"
               >
-                <FaInstagram size={24} /> {/* Instagram icon */}
+                <FaInstagram size={24} />
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 border-t border-gray-700 pt-4 text-center">
-          <p className="text-sm">
+        <div className="mt-8 border-t border-[#E5E7EB] dark:border-[#1f2937] pt-4 text-center">
+          <p className="text-sm text-[#475569] dark:text-[#94a3b8]">
             &copy; {new Date().getFullYear()} YouWatch. All rights reserved.
           </p>
         </div>

@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { axiosJSON } from "../../api/axiosInstances";
 import UpdateProfile from "./UpdateProfilePicture";
 import UpdateBanner from "./UpdateBanner";
-import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import ChangePassword from "./ChangePassword"; // Your ChangePassword component
+import CustomToast from "@/components/custom/CustomToast";
 
 const UserProfile = () => {
   const [user, setUser] = useState({
@@ -14,7 +14,6 @@ const UserProfile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPasswordChange, setIsPasswordChange] = useState(false); // State to control the password change modal
-  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -69,25 +68,26 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row  gap-10 p-8 dark:bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-800  text-white bg-gray-200">
+    <div className="flex flex-col lg:flex-row gap-10 p-8 bg-gray-200 dark:bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-800 text-white">
+      <CustomToast />
+
       {/* Avatar and Banner Upload Section */}
       <div className="w-full lg:w-1/3 flex flex-col items-center gap-4">
-        {/* Avatar Section */}
         <UpdateProfile />
-        {/* Banner Section */}
         <UpdateBanner />
       </div>
 
       {/* Profile Update Form */}
-      <div className="w-full lg:w-2/3 ">
-        <div className="dark:bg-gray-800 h-full rounded-xl shadow-lg p-6">
-          <h2 className="text-3xl font-semibold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500">
-            User Profile
+      <div className="w-full lg:w-2/3">
+        <div className="dark:bg-[#111827] bg-white h-full rounded-xl shadow-lg dark:shadow-[0_0_20px_#00FFF7] p-6 border dark:border-cyan-500 transition-all">
+          <h2 className="text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-400 dark:from-cyan-400 dark:to-pink-500 tracking-wide dark:font-futuristic">
+            🧬 User Profile
           </h2>
 
           <form onSubmit={handleSubmit}>
+            {/* Username */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-black dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-black dark:text-cyan-200 mb-2">
                 Username
               </label>
               <input
@@ -95,13 +95,14 @@ const UserProfile = () => {
                 name="username"
                 value={user.username}
                 onChange={handleInputChange}
-                className="w-full p-4 dark:bg-gray-700 bg-gray-100 text-black border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                className="w-full p-4 rounded-lg bg-gray-100 dark:bg-[#1e293b] text-black dark:text-white border border-gray-400 dark:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 dark:focus:ring-cyan-400"
                 required
               />
             </div>
 
+            {/* Full Name */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-black dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-black dark:text-cyan-200 mb-2">
                 Full Name
               </label>
               <input
@@ -109,44 +110,52 @@ const UserProfile = () => {
                 name="fullName"
                 value={user.fullName}
                 onChange={handleInputChange}
-                className="w-full p-4 dark:bg-gray-700 bg-gray-100 text-black border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
+                className="w-full p-4 rounded-lg bg-gray-100 dark:bg-[#1e293b] text-black dark:text-white border border-gray-400 dark:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 dark:focus:ring-cyan-400"
                 required
               />
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 bg-gradient-to-r from-amber-600 to-rose-500 text-white font-semibold rounded-lg shadow-lg hover:bg-gradient-to-l hover:from-amber-600 hover:to-rose-500 transition duration-300"
+              className="w-full py-3 font-semibold rounded-lg transition duration-300 text-white
+          bg-gradient-to-r from-amber-600 to-rose-500 hover:from-amber-700 hover:to-rose-600
+          dark:bg-gradient-to-r dark:from-cyan-500 dark:to-fuchsia-500 dark:hover:from-cyan-400 dark:hover:to-pink-500
+          dark:border dark:border-cyan-400 dark:shadow-[0_0_10px_#00FFF7]
+          dark:font-futuristic"
             >
-              Update Profile
+              🚀 Update Profile
             </button>
           </form>
 
-          {/* Button to open password change modal */}
+          {/* Change Password Button */}
           <div className="mt-6 text-center">
             <button
               onClick={openPasswordModal}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300"
+              className="w-full py-3 rounded-lg font-semibold transition duration-300 text-white
+          bg-blue-600 hover:bg-blue-700
+          dark:bg-gradient-to-r dark:from-blue-500 dark:to-cyan-400 dark:hover:from-cyan-400 dark:hover:to-blue-500
+          dark:border dark:border-cyan-300 dark:shadow-[0_0_10px_#00FFF7]
+          dark:font-futuristic"
             >
-              Change Password
+              🔐 Change Password
             </button>
           </div>
 
           {/* Delete Account Button */}
-          <div className="mt-8 text-center ">
+          <div className="mt-8 text-center">
             <button
               onClick={() => setIsModalOpen(true)}
-              className="w-full  py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition duration-300"
+              className="w-full py-3 rounded-lg font-semibold transition duration-300 text-white
+          bg-red-600 hover:bg-red-700
+          dark:bg-gradient-to-r dark:from-red-500 dark:to-pink-500 dark:hover:from-pink-600 dark:hover:to-red-600
+          dark:border dark:border-pink-400 dark:shadow-[0_0_10px_#FF007C]
+          dark:font-futuristic"
             >
-              Delete Account
+              🧨 Delete Account
             </button>
           </div>
         </div>
-
-        {!user.isGoogleUser && <ToastContainer />}
-        {user.isGoogleUser && (
-          <div>You cannot change the password for Google accounts.</div>
-        )}
       </div>
 
       {/* Password Change Modal */}
@@ -156,26 +165,13 @@ const UserProfile = () => {
           onClick={closePasswordModal}
         >
           <div
-            className="bg-gray-800 p-6 rounded-xl shadow-lg max-w-sm w-full"
             onClick={(e) => e.stopPropagation()}
+            className="p-0 max-w-md w-full"
           >
-            {!user?.isGoogleUser ? (
-              <ChangePassword
-                closeModel={closePasswordModal}
-                onSuccess={handlePasswordChangeSuccess}
-              />
-            ) : (
-              "You have used google account to signup can't change the password"
-            )}
-
-            <div className="flex justify-between gap-4 mt-4">
-              <button
-                onClick={closePasswordModal}
-                className="w-full py-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition duration-200"
-              >
-                Close
-              </button>
-            </div>
+            <ChangePassword
+              closeModel={closePasswordModal}
+              onSuccess={handlePasswordChangeSuccess}
+            />
           </div>
         </div>
       )}
@@ -183,32 +179,43 @@ const UserProfile = () => {
       {/* Delete Confirmation Modal */}
       {isModalOpen && (
         <div
-          className="fixed inset-0  bg-black bg-opacity-70 flex justify-center items-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-sm w-full"
+            className="bg-white dark:bg-[#111827] border border-gray-300 dark:border-cyan-500 rounded-2xl shadow-xl dark:shadow-[0_0_20px_#00FFF7] max-w-sm w-full p-6 relative dark:font-futuristic transition-all"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-2xl font-bold text-black dark:text-white mb-4">
-              Confirm Deletion
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-cyan-300 text-center mb-4 tracking-wide">
+              ⚠️ Confirm Deletion
             </h3>
-            <p className="mb-4 text-sm text-gray-700 dark:text-gray-400">
-              Are you sure you want to delete your account? This action cannot
-              be undone.
+
+            <p className="text-center text-sm text-gray-700 dark:text-cyan-100 mb-6">
+              Are you sure you want to delete your account?{" "}
+              <span className="text-red-600 dark:text-pink-400 font-semibold">
+                This action cannot be undone.
+              </span>
             </p>
 
-            <div className="flex justify-between gap-4">
+            <div className="flex gap-4">
+              {/* Cancel Button */}
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="w-full py-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition duration-200"
+                className="w-1/2 py-2 rounded-lg border border-gray-400 text-gray-700 hover:bg-gray-200
+          dark:border-cyan-600 dark:text-cyan-300 dark:hover:bg-[#1e293b] transition-all font-semibold"
               >
                 Cancel
               </button>
+
+              {/* Delete Button */}
               <button
                 onClick={handleDeleteAccount}
                 disabled={isDeleting}
-                className="w-full py-2 bg-red-600 hover:bg-red-700 rounded-lg transition duration-200"
+                className={`w-1/2 py-2 rounded-lg text-white font-semibold transition-all ${
+                  isDeleting
+                    ? "bg-gray-500 cursor-not-allowed"
+                    : "bg-red-600 hover:bg-red-700 dark:bg-gradient-to-r dark:from-pink-500 dark:to-red-600 dark:hover:from-pink-600 dark:hover:to-red-700"
+                }`}
               >
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>

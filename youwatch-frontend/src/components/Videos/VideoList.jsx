@@ -19,19 +19,21 @@ const VideoList = () => {
   }, []);
 
   return (
-    <div className="w-full  min-h-screen bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900">
-      <div className="w-full min-h-screen p-4 bg-opacity-90 dark:bg-gradient-to-b from-gray-800 to-black bg-white dark:text-white shadow-xl">
-        {/* Video grid container */}
-        <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
+    <div className="w-full min-h-screen bg-[#F8FAFC] dark:bg-[#0a0f1c] text-[#0f172a] dark:text-[#F1F5F9] px-4 py-6 transition-all duration-300">
+      <div className="max-w-7xl mx-auto">
+        {/* Grid container */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {videos.length > 0 ? (
             videos.map((video) => (
-              <div key={video?._id} className="w-full h-auto mx-auto  ">
-                {/* Ensure VideoCard takes full width on smaller screens */}
+              <div
+                key={video?._id}
+                className="transition-all duration-300 transform hover:scale-[1.01] dark:hover:shadow-[0_0_15px_#00FFF7] rounded-lg"
+              >
                 <VideoCard video={video} />
               </div>
             ))
           ) : (
-            <div className="text-center text-black font-bold text-2xl">
+            <div className="col-span-full text-center font-bold text-2xl text-[#475569] dark:text-cyan-400 dark:font-futuristic mt-20 animate-pulse">
               No videos found
             </div>
           )}

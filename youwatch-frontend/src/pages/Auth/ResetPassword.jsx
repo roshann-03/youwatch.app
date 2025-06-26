@@ -6,7 +6,7 @@ export default function ResetPassword() {
   const { token } = useParams();
   const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // New state for confirm password
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -15,7 +15,6 @@ export default function ResetPassword() {
     setError("");
     setMessage("");
 
-    // Validate if new password and confirm password match
     if (newPassword !== confirmPassword) {
       return setError("Passwords do not match. Please try again.");
     }
@@ -25,56 +24,69 @@ export default function ResetPassword() {
         newPassword,
       });
 
-      setMessage("Password reset successful. You can now log in.");
-      setTimeout(() => navigate("/login"), 1000);
+      setMessage("✅ Password reset successful. You can now log in.");
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to reset password. Try again."
+        err.response?.data?.message || "❌ Failed to reset password. Try again."
       );
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen dark:bg-gradient-to-r dark:from-slate-700 dark:to-slate-900   bg-gradient-to-r from-rose-500 to-purple-500 px-4">
-      <div className="w-full sm:w-96 bg-white p-8 rounded-lg shadow-lg dark:bg-gray-900">
-        <h2 className="text-2xl font-semibold text-gray-800 text-center dark:text-gray-300 mb-6">
-          Reset Password
+    <div className="flex justify-center items-center h-screen px-4 dark:bg-gradient-to-r dark:from-[#0a0f1c] dark:to-[#111827] bg-gradient-to-br from-pink-100 to-indigo-100">
+      <div className="w-full sm:w-[400px] backdrop-blur-lg bg-white/80 dark:bg-[#111827]/80 dark:border-cyan-500 border border-gray-200 dark:shadow-[0_0_30px_#00FFF7] shadow-lg rounded-2xl p-8 font-sans dark:font-futuristic">
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-cyan-300 tracking-wider">
+          🔐 Reset Password
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block text-sm font-medium dark:text-gray-200 ">
-            New Password
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-cyan-200 mb-1">
+              New Password
+            </label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full mt-1 p-3  dark:text-gray-200 border border-gray-500 rounded-md  dark:bg-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-12 px-4 rounded-md border border-gray-400 dark:border-cyan-600 bg-white dark:bg-[#1e293b] text-gray-800 dark:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-cyan-500 transition-all"
               required
             />
-          </label>
+          </div>
 
-          <label className="block text-sm font-medium dark:text-gray-200  ">
-            Confirm Password
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-cyan-200 mb-1">
+              Confirm Password
+            </label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full mt-1 p-3 dark:text-gray-200  border border-gray-500 rounded-md dark:bg-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-12 px-4 rounded-md border border-gray-400 dark:border-cyan-600 bg-white dark:bg-[#1e293b] text-gray-800 dark:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-cyan-500 transition-all"
               required
             />
-          </label>
+          </div>
 
           <button
             type="submit"
-            className="w-full bg-sky-600 text-white py-3 rounded-md hover:bg-sky-700 transition duration-200"
+            className="w-full py-3 rounded-md font-semibold text-white transition duration-200 
+              bg-red-600 hover:bg-red-700 dark:bg-gradient-to-r dark:from-[#3A86FF] dark:to-[#00FFF7] 
+              dark:hover:from-blue-500 dark:hover:to-cyan-400"
           >
-            Reset Password
+            {message ? "Redirecting..." : "Reset Password"}
           </button>
         </form>
 
         {message && (
-          <p className="text-green-600 mt-4 text-center">{message}</p>
+          <p className="mt-4 text-green-600 dark:text-green-400 text-center text-sm font-medium">
+            {message}
+          </p>
         )}
-        {error && <p className="text-red-600 mt-4 text-center">{error}</p>}
+        {error && (
+          <p className="mt-4 text-red-600 dark:text-red-400 text-center text-sm font-medium">
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );

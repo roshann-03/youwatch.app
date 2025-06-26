@@ -49,10 +49,20 @@ const Subscription = ({ channelId }) => {
   return (
     <div className="subscribeButton">
       <button
-        className={`${
-          subscriptionStatus ? "bg-red-600 text-white" : "bg-gray-800 text-white dark:bg-white dark:text-black"
-        }  text-sm  font-semibold px-4 py-2 rounded-3xl`}
         onClick={handleSubscribe}
+        className={`px-5 py-2 text-sm font-bold rounded-full transition-all duration-300 tracking-wider shadow-md
+          ${
+            subscriptionStatus
+              ? // 🔴 SUBSCRIBED
+                `bg-red-600 text-white hover:bg-red-700
+                dark:bg-[#FF2C75] dark:text-white dark:shadow-[0_0_12px_#FF2C75] 
+                dark:hover:shadow-[0_0_18px_#FF2C75]`
+              : // ⚪ SUBSCRIBE
+                `bg-gray-200 text-gray-800 hover:bg-gray-300
+                dark:bg-[#0F172A] dark:text-cyan-300 dark:border dark:border-cyan-400
+                dark:hover:bg-[#1e293b] dark:shadow-[0_0_10px_#00FFF7]
+                dark:hover:shadow-[0_0_15px_#00FFF7]`
+          }`}
       >
         {subscriptionStatus ? "Subscribed" : "Subscribe"}
       </button>

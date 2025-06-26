@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import GoogleLoginButton from "../../components/Auth/GoogleLoginButton";
 import { axiosJSON } from "../../api/axiosInstances";
 import { useAuth } from "../../ContextAPI/AuthContext";
+import CustomToast from "@/components/custom/CustomToast";
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -12,19 +13,20 @@ const Login = ({ onLogin }) => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  const notify = (message) => toast(message);
 
   useEffect(() => {
     if (location.state?.message) {
-      notify(location.state.message);
+      toast(location.state.message);
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location, navigate]);
 
   const handleChange = (e) => {
+    setError("");
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -33,48 +35,43 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     const { emailOrUsername, password } = formData;
 
-    if (!emailOrUsername) {
-      notify("Username or email is required");
+    if (!emailOrUsername || !password) {
+      setError("Both fields are required");
       return;
     }
 
     setLoading(true);
-
     try {
-      const response = await axiosJSON.post("/users/login", {
-        emailOrUsername,
-        password,
-      });
-
-      if (response.status === 200) {
-        localStorage.removeItem("user");
-        const user = response.data.data.user;
-        localStorage.setItem("user", JSON.stringify(user));
-        notify("Login successful!");
-        login();
-        onLogin();
-        navigate("/");
-      } else {
-        notify("Invalid credentials.");
-      }
+      const response = await axiosJSON.post("/users/login", formData);
+      const user = response.data.data.user;
+      localStorage.setItem("user", JSON.stringify(user));
+      toast.success("Welcome back, Commander 🤖");
+      login();
+      onLogin();
+      navigate("/");
     } catch (error) {
-      const message =
+      setError(
         error?.response?.data?.message ||
-        "Invalid email or username or password. Please try again.";
-      notify(message);
+          "Invalid credentials. Try again or reset password."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-black p-4">
-      <div className="w-full max-w-md dark:bg-gray-950 rounded-2xl shadow-2xl p-8 sm:p-10">
-        <h2 className="text-3xl font-bold text-center dark:text-white mb-6">
-          Login Account
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-white to-gray-100 dark:from-[#0a0f1c] dark:to-[#111827] dark:font-futuristic p-4">
+      <div className="w-full max-w-md backdrop-blur-md bg-white/70 dark:bg-[#0a0f1c]/70 border border-gray-300 dark:border-[#334155] rounded-2xl shadow-lg dark:shadow-[0_0_30px_#00FFF7] p-8 sm:p-10">
+        <h2 className="text-3xl font-bold text-center text-[#0f172a] dark:text-cyan-300 tracking-wider mb-6">
+          🔐 Login Account
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <p className="text-red-600 dark:text-red-500 text-sm font-semibold text-center -mt-2 mb-4">
+              ⚠️ {error}
+            </p>
+          )}
           {[
             {
               name: "emailOrUsername",
@@ -85,17 +82,28 @@ const Login = ({ onLogin }) => {
           ].map(({ name, label, type }) => (
             <div className="relative" key={name}>
               <input
+                id={name}
                 type={type}
                 name={name}
                 value={formData[name]}
                 onChange={handleChange}
                 required
-                className="peer h-12 w-full rounded-md border border-gray-600 bg-transparent px-3 pt-4 dark:text-white placeholder-transparent focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all"
                 placeholder={label}
+                className={`peer h-12 w-full rounded-md border  text-lg bg-transparent px-3 pt-4 dark:font-mono
+                  text-gray-800 dark:text-cyan-100
+                  border-gray-400 dark:border-cyan-800
+                  placeholder-transparent
+                  focus:outline-none focus:ring-1 dark:focus:ring-cyan-500 dark:focus:border-cyan-500 transition-all`}
               />
               <label
                 htmlFor={name}
-                className="absolute left-3 top-2 text-sm text-gray-400 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2 peer-focus:text-sm peer-focus:text-red-400"
+                className={`absolute left-3 transition-all pointer-events-none
+                  ${
+                    formData[name]
+                      ? "hidden"
+                      : "top-3.5 text-base text-gray-500 dark:text-gray-400"
+                  }
+                  peer-focus:top-2 peer-focus:text-sm dark:peer-focus:text-cyan-300`}
               >
                 {label}
               </label>
@@ -105,42 +113,42 @@ const Login = ({ onLogin }) => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 transition duration-200 text-white font-semibold ${
+            className={`hover:bg-red-700  w-full py-3 rounded-lg bg-red-600 dark:bg-gradient-to-r from-[#3A86FF] to-[#00FFF7] hover:from-blue-600 hover:to-cyan-400 transition duration-300 text-white font-semibold tracking-wide dark:shadow-lg ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Authenticating..." : "Login"}
           </button>
 
           <div className="flex items-center gap-4 my-4">
-            <div className="h-px flex-1 bg-gray-700" />
-            <span className="text-gray-400 text-sm">OR</span>
-            <div className="h-px flex-1 bg-gray-700" />
+            <div className="h-px flex-1 bg-gray-300 dark:bg-gray-600" />
+            <span className="text-sm text-gray-500 dark:text-gray-400">OR</span>
+            <div className="h-px flex-1 bg-gray-300 dark:bg-gray-600" />
           </div>
 
           <div className="flex justify-center">
             <GoogleLoginButton />
           </div>
 
-          <div className="flex justify-between text-sm text-gray-400 pt-4">
+          <div className="flex justify-between text-sm pt-4 text-gray-500 dark:text-gray-400">
             <button
               type="button"
               onClick={() => navigate("/register")}
-              className="hover:text-red-400"
+              className="dark:hover:text-cyan-400 hover:text-blue-600 "
             >
-              Don’t have an account?
+              🚀 Create Account
             </button>
             <button
               type="button"
               onClick={() => navigate("/forgot-password")}
-              className="hover:text-red-400"
+              className="dark:hover:text-cyan-400 hover:text-blue-600"
             >
-              Forgot password?
+              Forgot Password?
             </button>
           </div>
         </form>
 
-        <ToastContainer />
+        <CustomToast />
       </div>
     </div>
   );

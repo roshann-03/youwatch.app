@@ -1,129 +1,96 @@
 import { useEffect, useState } from "react";
-import { axiosJSON } from "../../api/axiosInstances"; // Assuming axiosJSON is a pre-configured axios instance.
-import { toast } from "react-toastify"; // Import toast
+import { axiosJSON } from "../../api/axiosInstances";
+import CustomToast from "@/components/custom/CustomToast";
 
-const ChangePassword = ({ closeModel }) => {
+const ChangePassword = ({ closeModel, onSuccess }) => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [formError, setFormError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError("");
 
-    // Check if new password and confirm password match
     if (newPassword !== confirmPassword) {
-      toast.error("New password and confirm password do not match");
-      return;
+      return setFormError("New password and confirm password do not match");
     }
 
     setLoading(true);
-
     try {
       const response = await axiosJSON.post("/users/change-password", {
         oldPassword,
         newPassword,
       });
+
       if (response.status === 200) {
-        // On successful password change
-        toast.success("Password changed successfully!");
-        setOldPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-        closeModel();
+        setTimeout(() => {
+          onSuccess();
+        }, 100);
       }
     } catch (error) {
-      // On error, show an error message
-      console.error(error);
-      toast.error(error?.response?.data?.message || "Something went wrong.");
+      setFormError(error?.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="dark:bg-gray-800 bg-gray-100 dark:text-white text-black rounded-lg shadow-xl max-w-md w-full p-8 transform transition-all duration-300 ease-in-out scale-95 hover:scale-100">
-        <h2 className="text-2xl text-transparent  font-semibold mb-6 text-center text-gradient bg-clip-text bg-gradient-to-r from-rose-500 to-purple-600">
-          Change Password
-        </h2>
+    <div className="dark:bg-[#111827] bg-white p-6 rounded-xl shadow-xl border dark:border-cyan-600 dark:shadow-[0_0_20px_#00FFF7] transition-all dark:font-futuristic">
+      <h2 className="text-2xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 dark:from-cyan-400 dark:to-pink-500">
+        🛡 Change Password
+      </h2>
 
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-6">
-            <div>
-              <label
-                htmlFor="oldPassword"
-                className="block text-sm font-semibold dark:text-gray-300"
-              >
-                Old Password
-              </label>
-              <input
-                type="password"
-                id="oldPassword"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                className="w-full mt-2 p-3 bg-white dark:text-white rounded-lg border border-gray-600 focus:outline-none focus:border-blue-500 dark:bg-gray-900 dark:border-gray-600"
-                required
-              />
-            </div>
+      {formError && (
+        <p className="mb-4 text-center text-sm text-red-600 dark:text-red-400 font-medium">
+          ⚠ {formError}
+        </p>
+      )}
 
-            <div>
-              <label
-                htmlFor="newPassword"
-                className="block text-sm font-semibold dark:text-gray-300"
-              >
-                New Password
-              </label>
-              <input
-                type="password"
-                id="newPassword"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full mt-2 p-3 bg-white dark:text-white rounded-lg border border-gray-600 focus:outline-none focus:border-blue-500 dark:bg-gray-900 dark:border-gray-600"
-                required
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-semibold dark:text-gray-300"
-              >
-                Confirm New Password
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full mt-2 p-3 bg-white dark:text-white rounded-lg border border-gray-600 focus:outline-none focus:border-blue-500 dark:bg-gray-900 dark:border-gray-600"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-center mt-6">
-            <button
-              type="submit"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition duration-200 transform hover:scale-105 disabled:opacity-50"
-              disabled={loading}
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {[
+          ["Old Password", oldPassword, setOldPassword, "oldPassword"],
+          ["New Password", newPassword, setNewPassword, "newPassword"],
+          [
+            "Confirm New Password",
+            confirmPassword,
+            setConfirmPassword,
+            "confirmPassword",
+          ],
+        ].map(([label, value, set, id]) => (
+          <div key={id}>
+            <label
+              htmlFor={id}
+              className="block text-sm font-semibold text-gray-700 dark:text-cyan-300 mb-1"
             >
-              {loading ? "Changing..." : "Change Password"}
-            </button>
+              {label}
+            </label>
+            <input
+              id={id}
+              type="password"
+              value={value}
+              onChange={(e) => set(e.target.value)}
+              required
+              className="w-full p-3 rounded-lg bg-white text-gray-800 border border-gray-400
+                dark:bg-[#1e293b] dark:text-cyan-100 dark:border-cyan-600 
+                focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-cyan-400 transition-all"
+            />
           </div>
-        </form>
+        ))}
 
-        {/* Close Button */}
-        <div className="mt-6 text-center">
-          <button
-            onClick={closeModel}
-            className="text-sm bg-red-500 py-3 w-full rounded-lg text-white font-bold  dark:text-gray-200 dark:hover:text-gray-300 hover:bg-red-600 hover:scale-105 transition duration-200"
-          >
-            Close
-          </button>
-        </div>
-      </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full py-3 font-semibold rounded-lg text-white transition-all duration-300 ${
+            loading
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 dark:bg-gradient-to-r dark:from-cyan-500 dark:to-blue-600 dark:hover:from-cyan-400 dark:hover:to-blue-500 dark:shadow-[0_0_15px_#00FFF7]"
+          }`}
+        >
+          {loading ? "Changing..." : "🔐 Change Password"}
+        </button>
+      </form>
     </div>
   );
 };

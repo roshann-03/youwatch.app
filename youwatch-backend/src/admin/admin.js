@@ -40,10 +40,8 @@ const admin = new AdminJS({
   rootPath: "/admin",
   branding: {
     companyName: "YouWatch Admin",
-    logo: `${process.env.FRONTEND_URL}/logo3.png`,
     softwareBrothers: false,
     withMadeWithLove: false,
-    favicon: `${process.env.FRONTEND_URL}/logo.svg`,
     theme: {
       colors: {
         primary100: "#0d1117",
@@ -67,8 +65,12 @@ const adminRouter = buildAuthenticatedRouter(
   admin,
   {
     authenticate: async (email, password) => {
-      if (email === ADMIN.email && password === ADMIN.password) {
-        return ADMIN;
+      // Replace with your own admin auth logic
+      if (
+        email === process.env.ADMIN_EMAIL &&
+        password === process.env.ADMIN_PASSWORD
+      ) {
+        return ADMIN; // must return a truthy object on success
       }
       return null;
     },
@@ -82,7 +84,7 @@ const adminRouter = buildAuthenticatedRouter(
     secret: process.env.COOKIE_SECRET,
     cookie: {
       httpOnly: true,
-      secure: true, // true in production to enforce HTTPS
+      secure: process.env.NODE_ENV === "production", // true in production to enforce HTTPS
       sameSite: "lax", // lax is default-safe for same-origin
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     },

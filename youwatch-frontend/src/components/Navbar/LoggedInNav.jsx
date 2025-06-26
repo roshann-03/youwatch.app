@@ -1,149 +1,175 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
-import BackButton from "../Buttons/BackButton";
-import ForwardButton from "../Buttons/ForwardButton";
-import { FaBars, FaTimes } from "react-icons/fa";
 import ThemeToggle from "../ThemeToggle";
-import { useAuth } from "../../ContextAPI/AuthContext";
+import {
+  FaUser,
+  FaCog,
+  FaBell,
+  FaSignOutAlt,
+  FaHome,
+  FaVideo,
+  FaUpload,
+  FaStream,
+  FaNewspaper,
+} from "react-icons/fa";
+import { LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
+import { RiStickyNoteAddFill } from "react-icons/ri";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-const LoggedInNav = ({ onLogout }) => {
+const LoggedInNav = ({ onLogout, collapsed, setCollapsed }) => {
   const [user, setUser] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const sidebarRef = useRef(null);
-  const toggleButtonRef = useRef(null);
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const sidebarRef = useRef(null);
 
-  // Load user from localStorage
   useEffect(() => {
-    try {
-      const storedUser = JSON.parse(localStorage.getItem("user"));
-      if (storedUser) setUser(storedUser);
-    } catch (err) {
-      console.error("Failed to parse user:", err);
-    }
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) setUser(storedUser);
   }, []);
 
-  // Close sidebar if click is outside sidebar and toggle button
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(e.target) &&
-        toggleButtonRef.current &&
-        !toggleButtonRef.current.contains(e.target)
-      ) {
-        setSidebarOpen(false);
-      }
-    };
+  const handleClickOutside = (e) => {
+    if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
+      if (!collapsed) setCollapsed(true);
+    }
+  };
 
+  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const openSidebar = () => {
-    setSidebarOpen(true);
-    console.log("Sidebar opened");
-  };
-
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-    console.log("Sidebar closed");
-  };
+  }, [collapsed]);
 
   const handleRoute = (path) => {
     navigate(path);
-    closeSidebar();
+    setCollapsed(true);
   };
 
+  const menuItems = [
+    { label: "Home", path: "/", icon: <FaHome /> },
+    { label: "Trending", path: "/trending", icon: <FaStream /> },
+    { label: "Subscriptions", path: "/subscribed-channels", icon: <FaUser /> },
+    { label: "Upload Video", path: "/upload", icon: <FaUpload /> },
+    { label: "My Videos", path: "/my-videos", icon: <FaVideo /> },
+    { label: "Posts", path: "/posts/all", icon: <FaNewspaper /> },
+    { label: "My Posts", path: "/posts", icon: <RiStickyNoteAddFill /> },
+  ];
+
   return (
-    <div className="sticky top-0 z-20">
+    <>
       {/* Sidebar */}
-      <div
-        ref={sidebarRef}
-        className={`fixed top-0 left-0 h-full z-30 transition-all duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } dark:bg-gradient-to-b from-gray-800 to-black bg-white dark:text-white w-64 overflow-y-auto custom-scrollbar`}
-      >
-        <div className="flex justify-end pt-3 pr-3">
-          <FaTimes
-            className="dark:text-white text-xl mt-5 cursor-pointer"
-            onClick={closeSidebar}
-          />
-        </div>
-        <ul className="flex mt-8 flex-col space-y-3 px-6">
-          {[
-            { label: "Home", path: "/" },
-            { label: "Trending", path: "/" },
-            { label: "Subscriptions", path: "/subscribed-channels" },
-            { label: "Upload Video", path: "/upload" },
-            { label: "My Videos", path: "/my-videos" },
-            { label: "Posts", path: "/posts/all" },
-            { label: "My Posts", path: "/posts" },
-            { label: "Logout", path: "/logout", isLogout: true },
-          ].map((item) => (
-            <li
-              key={item.label}
-              className="cursor-pointer flex items-center gap-2 dark:hover:text-gray-400 hover:bg-gray-700 hover:text-gray-300 px-4 py-2 rounded-lg transition-all duration-300"
-              onClick={() =>
-                item.isLogout ? onLogout() : handleRoute(item.path)
-              }
+      <div ref={sidebarRef}>
+        <aside
+          className={`fixed top-[64px] left-0 h-[calc(100vh-64px)] z-40 bg-[#F8FAFC] dark:bg-[#0a0f1c] text-[#0f172a] dark:text-[#F1F5F9] shadow-xl transition-all duration-300 border-r border-[#E5E7EB] dark:border-[#1f2937] font-sans dark:font-futuristic  ${
+            collapsed ? "w-16" : "w-64"
+          }`}
+        >
+          <div className="flex justify-end mr-3 p-2">
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="text-2xl sidebar-toggle hover:scale-110 transition-transform"
+              title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
             >
-              <span>{item.label}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Top Navigation */}
-      <nav className="dark:bg-gradient-to-b from-gray-800 to-black bg-white dark:text-white pt-4 pb-3 px-6 flex justify-between items-center shadow-lg w-full">
-        <div className="flex items-center gap-4">
-          {/* Sidebar Toggle Button */}
-          <FaBars
-            ref={toggleButtonRef}
-            onClick={openSidebar}
-            className="dark:text-white text-2xl cursor-pointer"
-          />
-
-          {/* Back/Forward */}
-          <div className="gap-1 hidden sm:flex">
-            <BackButton onClick={() => navigate(-1)} />
-            <ForwardButton onClick={() => navigate(1)} />
+              {collapsed ? <LuPanelLeftOpen /> : <LuPanelLeftClose />}
+            </button>
           </div>
 
-          {/* Logo */}
+          <div className="flex flex-col px-2 pt-2 space-y-1 overflow-y-auto custom-scrollbar max-h-[calc(100%-100px)]">
+            {menuItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleRoute(item.path)}
+                className={`flex items-center w-full px-3 py-3 rounded-lg hover:bg-[#CBD5E1] dark:hover:bg-[#1e293b] transition-all ${
+                  collapsed ? "justify-center" : "gap-3"
+                }`}
+                title={collapsed ? item.label : ""}
+              >
+                {item.icon}
+                {!collapsed && (
+                  <span className="text-sm font-medium text-[#2d333e] dark:text-[#00FFF7]">
+                    {item.label}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </aside>
+      </div>
+
+      {/* Top Navbar */}
+      <header className="-ml-16 w-[100vw] h-16 bg-[#F8FAFC] text-[#0f172a] dark:bg-[#0a0f1c] dark:text-[#F1F5F9] px-3 lg:px-4 sticky top-0 z-50 flex items-center justify-between transition-all border-b border-[#E5E7EB] dark:border-[#1f2937]">
+        <div className="flex items-center gap-3">
           <Link to="/" className="flex items-center gap-2">
-            <div className="h-10 w-42 rounded-lg overflow-hidden">
+            <div className="h-10 w-14 rounded-lg overflow-hidden">
               <img
-                src="/logo3.png"
+                src="/logo.jpg"
                 alt="YouWatch Logo"
-                className="h-full w-full object-contain"
+                className="h-full w-full dark:hidden object-cover rounded-lg"
+              />
+              <img
+                src="/logo-dark.jpg"
+                alt="YouWatch Logo"
+                className="h-full w-full object-cover rounded-lg"
               />
             </div>
+            <span className="hidden md:block font-bold text-xl dark:text-[#00FFF7] tracking-wide font-futuristic text-gray-800 ">
+              YouWatch
+            </span>
           </Link>
         </div>
 
-        {/* Search */}
-        <div className="flex-1 mx-8 w-fit">
+        <div className="flex-1 px-4 max-w-md">
           <SearchBar />
         </div>
 
-        {/* Profile / Theme */}
-        <div className="relative flex gap-2 items-center">
+        <div className="flex items-center gap-4 mr-5">
           <ThemeToggle />
-          <Link to="/myprofile" className="text-white hover:text-blue-300">
-            <div className="w-14 h-14 border-2 border-blue-500 rounded-full overflow-hidden">
-              <img
-                src={user?.avatar || "/user.webp"}
-                alt={user?.username || "User"}
-                className="h-full w-full rounded-full object-cover"
-              />
-            </div>
-          </Link>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 focus:outline-none group">
+                <Avatar className="w-9 h-9 border-2 border-[#3A86FF] dark:border-[#00FFF7] shadow-md group-hover:scale-105 transition-transform">
+                  <AvatarImage src={user?.avatar || "/user.webp"} />
+                  <AvatarFallback>
+                    {user?.username?.charAt(0) || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden lg:inline font-medium text-sm text-[#475569] dark:text-[#F1F5F9] group-hover:text-[#0f172a] dark:group-hover:text-cyan-100 transition underline">
+                  {user?.username || "User"}
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-48 mt-2 rounded-xl shadow-xl border border-[#E5E7EB] dark:border-[#1f2937] bg-[#E2E8F0] dark:bg-[#111827] text-[#0f172a] dark:text-slate-100">
+              <DropdownMenuItem onClick={() => handleRoute("/myprofile")}>
+                {" "}
+                <FaUser className="mr-2 text-[#2d333e] dark:text-[#00FFF7]" />{" "}
+                Profile{" "}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleRoute("/profile")}>
+                {" "}
+                <FaCog className="mr-2 text-[#2d333e] dark:text-[#00FFF7]" />{" "}
+                Settings{" "}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleRoute("/notifications")}>
+                {" "}
+                <FaBell className="mr-2 text-[#2d333e] dark:text-[#00FFF7]" />{" "}
+                Notifications{" "}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onLogout}>
+                {" "}
+                <FaSignOutAlt className="mr-2 text-[rgb(233,54,80)] dark:text-[#FF00A8]" />{" "}
+                Logout{" "}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </nav>
-    </div>
+      </header>
+    </>
   );
 };
 

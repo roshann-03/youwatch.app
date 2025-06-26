@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import VideoCard from "../../components/Videos/VideoCard";
 import { axiosJSON } from "../../api/axiosInstances";
 import { useNavigate } from "react-router-dom";
+import DeleteModal from "@/components/modals/DeleteModal"; // Make sure this path is correct
 
 const MyVideos = () => {
   const [videos, setVideos] = useState([]);
-  const [videoToDelete, setVideoToDelete] = useState(null); // Store the video to be deleted
+  const [videoToDelete, setVideoToDelete] = useState(null);
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
 
@@ -13,8 +14,7 @@ const MyVideos = () => {
     const fetchVideos = async () => {
       try {
         const response = await axiosJSON.get(`/videos/c/${user._id}`);
-        const videoData = response?.data.data;
-        setVideos(videoData);
+        setVideos(response?.data?.data || []);
       } catch (error) {
         console.error("Error fetching videos", error);
         setVideos([]);
@@ -24,18 +24,17 @@ const MyVideos = () => {
   }, [user._id]);
 
   const handleDeleteClick = (video) => {
-    setVideoToDelete(video); // Set the video to delete
+    setVideoToDelete(video);
   };
 
   const handleDeleteConfirm = async () => {
     try {
-      // Call API to delete video
       const response = await axiosJSON.delete(`/videos/${videoToDelete._id}`);
       if (response.status === 200) {
-        // Remove deleted video from the state
-        setVideos(videos.filter((video) => video._id !== videoToDelete._id));
-        setVideoToDelete(null); // Reset the modal state
-        window.location.href = window.location.href;
+        setVideos((prev) =>
+          prev.filter((video) => video._id !== videoToDelete._id)
+        );
+        setVideoToDelete(null);
       }
     } catch (error) {
       console.error("Error deleting video", error);
@@ -43,61 +42,60 @@ const MyVideos = () => {
   };
 
   const handleUploadClick = () => {
-    navigate("/upload"); // Navigate to the upload page when clicked
+    navigate("/upload");
   };
 
   return (
-    <div className="w-full min-h-screen dark:bg-black bg-gray-100 flex flex-col">
-      <div className="flex flex-col items-center p-5">
+    <div className="w-full min-h-screen dark:bg-[#0a0f1c] bg-gray-100 transition-all font-sans dark:font-futuristic px-4 py-8">
+      <div className="max-w-7xl mx-auto">
         {videos.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {videos.map((video) => (
               <div key={video._id} className="relative">
                 <VideoCard
                   video={video}
                   isOptions={true}
-                  onDeleteClick={() => handleDeleteClick(video)} // Pass delete click handler
+                  onDeleteClick={() => handleDeleteClick(video)}
                 />
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center mt-10 dark:text-white">
-            <h2 className="text-xl font-bold ">No videos found</h2>
-            <p className="mt-4 text-gray-400">
+          <div className="text-center mt-20">
+            <h2 className="text-2xl font-bold dark:text-cyan-300 text-gray-800 mb-3">
+              No Videos Found
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400">
               It looks like you haven't uploaded any videos yet.
             </p>
-            <div className="mt-6">
-              <button
-                onClick={handleUploadClick}
-                className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-300"
-              >
-                Upload Your First Video
-              </button>
-            </div>
-            <div className="mt-4 text-gray-500 dark:text-gray-400">
-              <p>
-                If you want to explore content, check out some popular videos
-                below:
-              </p>
+
+            <button
+              onClick={handleUploadClick}
+              className="mt-6 bg-gradient-to-r from-indigo-600 to-pink-500 dark:from-cyan-500 dark:to-fuchsia-600 hover:from-indigo-700 hover:to-pink-600 text-white py-2 px-6 rounded-xl shadow-lg transition-all duration-300"
+            >
+              🚀 Upload Your First Video
+            </button>
+
+            <div className="mt-8 text-gray-600 dark:text-gray-400">
+              <p>Or discover trending content</p>
               <button
                 onClick={() => navigate("/explore")}
-                className="text-blue-400 hover:underline"
+                className="mt-2 text-blue-500 hover:underline dark:text-cyan-300"
               >
-                Explore Videos
+                🌌 Explore Videos
               </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Conditional rendering for Delete Modal */}
+      {/* Delete confirmation modal */}
       {videoToDelete && (
         <DeleteModal
           isOpen={true}
-          onClose={() => setVideoToDelete(null)} // Close modal
-          onConfirm={handleDeleteConfirm} // Handle confirmation
-          videoTitle={videoToDelete.title} // Pass video title to modal
+          onClose={() => setVideoToDelete(null)}
+          onConfirm={handleDeleteConfirm}
+          videoTitle={videoToDelete.title}
         />
       )}
     </div>

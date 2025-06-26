@@ -27,6 +27,8 @@ import LoadingSpinner from "./components/LoadingSpinner";
 import SearchResultPortal from "./components/SearchResultPort";
 import { SearchResultProvider } from "./ContextAPI/SearchResultContext";
 import SetPassword from "./pages/Auth/SetPassword";
+import { toast } from "react-toastify";
+import OfflineStatus from "./components/OfflineStatus";
 // PrivateRoute to protect routes
 const PrivateRoute = ({ isAuthenticated, children }) => {
   if (!isAuthenticated) {
@@ -34,6 +36,7 @@ const PrivateRoute = ({ isAuthenticated, children }) => {
   }
   return children;
 };
+window.toast = toast;
 
 // RedirectedRoute for login and register pages
 const RedirectedRoute = ({ isAuthenticated, children }) => {
@@ -46,7 +49,21 @@ const RedirectedRoute = ({ isAuthenticated, children }) => {
 const App = () => {
   const { isLoggedIn, login, logout } = useAuth(); // Use context to get login state
   const [loading, setLoading] = useState(true);
+  const [collapsed, setCollapsed] = useState(true);
   const navigate = useNavigate();
+
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const updateOnlineStatus = () => setIsOnline(navigator.onLine);
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
+
+    return () => {
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
+    };
+  }, []);
 
   const handleLogin = () => {
     login();
@@ -95,13 +112,28 @@ const App = () => {
   }, []);
 
   // UI Loading state
+
+  if (!isOnline) return <OfflineStatus />;
+
   if (loading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {isLoggedIn ? <LoggedInNav onLogout={handleLogout} /> : <LoggedOutNav />}
+    <div
+      className={`min-h-screen bg-gray-100 transition-all duration-300 ${
+        isLoggedIn ? "ml-16" : ""
+      }`}
+    >
+      {isLoggedIn ? (
+        <LoggedInNav
+          onLogout={handleLogout}
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+        />
+      ) : (
+        <LoggedOutNav />
+      )}
       {isLoggedIn ? (
         <SearchResultPortal results={["lalala"]} visible={true} />
       ) : (

@@ -28,48 +28,43 @@ const registerUser = asyncHandler(async (req, res) => {
     $or: [{ username }, { email }],
   });
   //If the user already exists return error
-  if (existedUser && !existedUser?.isGoogleUser) {
+  if (existedUser) {
     return res
       .status(409)
       .json(new ApiError(409, "User with email or username already exists"));
   }
-  if (existedUser?.isGoogleUser) {
-    return res
-      .status(400)
-      .json(new ApiError(400, "Please log in using Google for this account."));
-  }
 
   //Upload avatar and cover image
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-  //const coverImageLocalPath = req.files?.coverImage[0]?.path;
-  let coverImageLocalPath;
+  let avatarLocalPath = null;
+  let coverImageLocalPath = null;
+
+  
   if (
     req.files &&
-    Array.isArray(req.files.coverImage) &&
+    Array.isArray(req.files?.avatar) &&
+    req.files.avatar.length > 0
+  ) {
+    avatarLocalPath = req.files.avatar[0]?.path;
+  }
+  //const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  if (
+    req.files &&
+    Array.isArray(req.files?.coverImage) &&
     req.files.coverImage.length > 0
   ) {
     coverImageLocalPath = req.files.coverImage[0].path;
   }
 
   //If the file is not given by user
-  if (!avatarLocalPath) {
-    return res
-      .status(400)
-      .json(
-        new ApiError(400, "avatarLocalPath Error: Avatar file is required")
-      );
-  }
+
   //Upload avatar and cover image on cloudinary cloud storage
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
-  if (!avatar) {
-    return res.status(400).json(new ApiError(400, "Avatar file is required"));
-  }
 
   const user = {
     fullName,
-    avatar: avatar.url,
-    coverImage: coverImage?.url || "",
+    avatar: avatar?.url || "/user.webp",
+    coverImage: coverImage?.url || "/banner.jpg",
     email,
     password,
     username: username.toLowerCase(),
@@ -105,13 +100,13 @@ const loginUser = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new ApiError(404, "User does not exist");
+    throw new ApiError(404, "Invalid credentials. Please try again.");
   }
   // Validate password
   const isPasswordValid = await user.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
-    throw new ApiError(401, "Invalid user credentials");
+    throw new ApiError(401, "Invalid credentials. Please try again.");
   }
 
   // Generate tokens

@@ -33,16 +33,19 @@ const SearchBar = () => {
 
   return (
     <form className="relative w-full max-w-md">
-      <div className="flex items-center border border-zinc-700 rounded-full dark:bg-zinc-800 dark:text-white">
+      <div className="flex items-center border border-[#1f2937] rounded-full bg-[#F8FAFC] dark:bg-[#1e293b] dark:text-cyan-300 text-[#0f172a]">
         <input
           type="text"
-          className="w-full px-4 py-2 bg-transparent dark:text-white focus:outline-none"
-          placeholder="Search"
+          className="w-full px-4 py-2 bg-transparent focus:outline-none placeholder:text-slate-400"
+          placeholder="Search YouWatch..."
           value={searchTerm}
           onChange={handleChange}
         />
-        <button type="submit" className="p-3 bg-zinc-800 rounded-r-full">
-          <CiSearch size={20} color="white" />
+        <button
+          type="submit"
+          className="p-3 rounded-r-full  dark:hover:bg-[#121822]"
+        >
+          <CiSearch size={20} color="#00FFF7" />
         </button>
       </div>
     </form>

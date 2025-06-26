@@ -1,23 +1,32 @@
-// src/components/LoggedOutNav.js
 import { Link } from "react-router-dom";
 import ThemeToggle from "../ThemeToggle";
+
 const LoggedOutNav = () => {
   return (
-    <nav className="dark:bg-black shadow-lg  p-4 flex justify-between items-center">
-      <div className="logo">
-        <Link to="/">
-          <div className="logo-container flex justify-center items-center">
-            <div className="logo h-10 w-14 rounded-lg flex justify-center items-center object-center object-cover">
-              <img
-                src={`/logo3.png`}
-                alt=""
-                className="h-full w-full rounded-lg"
-              />
-            </div>
-            <h1 className="dark:text-white font-bold text-xl ml-2">YouWatch</h1>
-          </div>
-        </Link>
-      </div>
+    <nav className="dark:bg-[#0a0f1c] bg-white border-b dark:border-[#1f2937] border-gray-200 shadow-lg px-6 py-4 flex justify-between items-center">
+      {/* Logo + Name */}
+      <Link to="/" className="flex items-center gap-3">
+        {/* Logo */}
+        <div className="h-10 w-14 rounded-lg overflow-hidden">
+          <img
+            src="/logo.jpg"
+            alt="YouWatch Logo"
+            className="h-full w-full dark:hidden object-cover rounded-lg"
+          />
+          <img
+            src="/logo-dark.jpg"
+            alt="YouWatch Logo"
+            className="h-full w-full object-cover rounded-lg"
+          />
+        </div>
+
+        {/* Title */}
+        <h1 className="text-xl font-bold tracking-wide font-futuristic text-gray-800 dark:text-[#00FFF7]">
+          YouWatch
+        </h1>
+      </Link>
+
+      {/* Theme Toggle */}
       <ThemeToggle />
     </nav>
   );

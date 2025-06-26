@@ -14,10 +14,19 @@
     "@mantine/core": "^5.10.5",
     "@mantine/hooks": "^5.10.5",
     "@mantine/rte": "^5.10.5",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.7",
     "@react-oauth/google": "^0.12.2",
+    "@tailwindcss/vite": "^4.1.10",
     "@tiptap/react": "^2.12.0",
     "@tiptap/starter-kit": "^2.12.0",
     "axios": "^1.7.7",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "dompurify": "^3.2.6",
     "firebase": "^11.8.1",
     "framer-motion": "^12.11.4",
@@ -29,7 +38,9 @@
     "react-icons": "^5.5.0",
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.27.0",
-    "react-toastify": "^10.0.6"
+    "react-toastify": "^10.0.6",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -44,7 +55,7 @@
     "eslint-plugin-react-refresh": "^0.4.13",
     "globals": "^15.11.0",
     "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.14",
+    "tailwindcss": "^3.4.17",
     "vite": "^5.4.9"
   }
 }

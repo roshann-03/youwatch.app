@@ -6,39 +6,31 @@ import DeleteModal from "../Modals/DeleteModal";
 
 const VideoCard = ({ video, isOptions = false }) => {
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
-  const [videoToDelete, setVideoToDelete] = useState(null); // Video to delete
-  const [openOptionsId, setOpenOptionsId] = useState(null); // Track which video's options are open
-  // console.log(video);
-  const optionsRef = useRef(null); // Reference for options button
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [videoToDelete, setVideoToDelete] = useState(null);
+  const [openOptionsId, setOpenOptionsId] = useState(null);
+  const optionsRef = useRef(null);
 
   const notify = (message) => toast(message);
 
-  // Format the time into a more readable format
   const timeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
     const seconds = Math.floor((now - date) / 1000);
-
     let interval = Math.floor(seconds / 31536000);
     if (interval >= 1)
       return `${interval} year${interval !== 1 ? "s" : ""} ago`;
-
     interval = Math.floor(seconds / 2592000);
     if (interval >= 1)
       return `${interval} month${interval !== 1 ? "s" : ""} ago`;
-
     interval = Math.floor(seconds / 86400);
     if (interval >= 1) return `${interval} day${interval !== 1 ? "s" : ""} ago`;
-
     interval = Math.floor(seconds / 3600);
     if (interval >= 1)
       return `${interval} hour${interval !== 1 ? "s" : ""} ago`;
-
     interval = Math.floor(seconds / 60);
     if (interval >= 1)
       return `${interval} minute${interval !== 1 ? "s" : ""} ago`;
-
     return `${seconds} second${seconds !== 1 ? "s" : ""} ago`;
   };
 
@@ -48,39 +40,26 @@ const VideoCard = ({ video, isOptions = false }) => {
   };
 
   const videoTitleTruncate = (title) => {
-    if (title.split(" ").length > 10) {
-      return title.split(" ").splice(0, 10).join(" ") + "...";
-    } else {
-      return title;
-    }
+    return title.split(" ").length > 10
+      ? title.split(" ").splice(0, 10).join(" ") + "..."
+      : title;
   };
 
   const handleOptions = (e) => {
     e.stopPropagation();
-    // Open options for the clicked video only
-    if (openOptionsId === video?._id) {
-      setOpenOptionsId(null); // Close options if already open
-    } else {
-      setOpenOptionsId(video?._id); // Open options for the clicked video
-    }
+    setOpenOptionsId((prevId) => (prevId === video?._id ? null : video?._id));
   };
 
   const handleDeleteClick = (video) => {
-    setVideoToDelete(video); // Set video to be deleted
-    setIsModalOpen(true); // Show modal
+    setVideoToDelete(video);
+    setIsModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
     try {
-      // Call API to delete video
       await axiosJSON.delete(`/videos/${videoToDelete._id}`);
       notify("Video deleted successfully");
-      // Close modal after deletion
       setIsModalOpen(false);
-      // Trigger parent component's delete success handler
-      // if (onDeleteSuccess) {
-      //   onDeleteSuccess(videoToDelete._id);
-      // }
     } catch (error) {
       console.error("Error deleting video", error);
       notify("Failed to delete video");
@@ -89,68 +68,109 @@ const VideoCard = ({ video, isOptions = false }) => {
 
   const handleVideoUpdate = (video) => {
     navigate(`/update-video`, { state: { video } });
-    setOpenOptionsId(null); // Close options after update
+    setOpenOptionsId(null);
     notify("Video updated successfully");
   };
 
-  // Close options when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (optionsRef.current && !optionsRef.current.contains(e.target)) {
-        setOpenOptionsId(null); // Close options if click is outside
+        setOpenOptionsId(null);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
-    <div className=" h-full">
+    <div className="h-full font-sans dark:font-futuristic">
       <div
-        className="video-card dark:bg-zinc-700 shadow-lg h-full flex flex-col w-full    rounded-xl cursor-pointer transition-all duration-300 "
         onClick={handleClick}
+        className="
+          bg-[#F8FAFC] 
+          dark:bg-[#0a0f1c] 
+          rounded-xl 
+          shadow-md 
+          border border-transparent 
+        
+          transition-all 
+          duration-300 
+          cursor-pointer
+          dark:font-futuristic
+          dark:border-cyan-400
+          dark:hover:border-cyan-600
+          "
       >
-        <div className="relative    dark:text-white ">
+        <div className="relative text-[#0f172a] dark:text-[#F1F5F9]">
           <img
-            className="w-full h-44 object-cover rounded-xl "
-            src={video?.thumbnail}
+            className="w-full h-44 object-cover rounded-t-xl"
+            src={video?.thumbnail || "/fallback-thumbnail.jpg"}
             alt={video?.title}
           />
-          <h3 className="font-medium text-sm absolute bottom-1 right-1 text-white bg-black bg-opacity-65 px-2 rounded">
+          <h3
+            className="
+            font-mono 
+            font-semibold 
+            text-sm 
+            absolute bottom-1 right-1 
+            text-white 
+            bg-[#0f172a] bg-opacity-80 
+            px-2 rounded 
+            dark:bg-cyan-900 dark:bg-opacity-80
+            dark:drop-shadow-[0_0_6px_#00FFF7]"
+          >
             {Math.floor(video?.duration / 60)}:
             {String(Math.floor(video?.duration % 60)).padStart(2, "0")}
           </h3>
         </div>
 
-        <div className="flex items-start gap-2 p-2 ">
-          <div className="w-12 h-12 rounded-full overflow-hidden">
-            {video?.owner.avatar && (
-              <img
-                src={video.owner.avatar}
-                alt={`${video.owner.name}'s avatar`}
-                className="w-full h-full object-cover"
-              />
-            )}
+        <div className="flex items-start gap-3 p-3">
+          <div
+            className="
+            w-12 h-12 rounded-full overflow-hidden border-2
+            border-[#3A86FF] dark:border-[#00FFF7]
+            dark:drop-shadow-[0_0_10px_#00FFF7]"
+          >
+            <img
+              src={video?.owner?.avatar || "/user.webp"}
+              alt={`${video?.owner?.name || "User"}'s avatar`}
+              className="w-full h-full object-cover"
+            />
           </div>
+
           <div className="flex-1 relative">
-            <h3 className="font-medium break-words dark:text-white text-black">
+            <h3
+              className="
+              font-medium break-words
+              dark:text-cyan-300 
+              text-gray-900
+              dark:font-futuristic
+              font-sans
+              tracking-wide
+              hover:underline
+              transition
+              duration-300
+            "
+            >
               {videoTitleTruncate(video?.title)}
             </h3>
-            <p className="dark:text-gray-200 text-gray-600 text-sm">
-              @{video?.owner?.name || video?.owner?.username}
+            <p className="text-sm text-[#475569] dark:text-[#94a3b8] font-mono">
+              @{video?.owner?.name || video?.owner?.username || "Unknown"}
             </p>
-            <p className="text-sm font-medium dark:text-white text-gray-600">
+            <p className="text-sm font-medium text-[#475569] dark:text-[#F1F5F9] font-mono">
               {video?.views} views • {timeAgo(video?.createdAt)}
             </p>
 
             {isOptions && (
               <div
-                onClick={(e) => handleOptions(e)}
-                className="absolute top-2 right-2 text-gray-400 hover:text-gray-300"
-                // ref={optionsRef}
+                onClick={handleOptions}
+                className="
+                  absolute top-2 right-2
+                  text-[#475569] dark:text-[#94a3b8]
+                  hover:text-[#3A86FF] dark:hover:text-[#00FFF7]
+                  cursor-pointer
+                  select-none
+                "
               >
                 <svg
                   id={video?._id}
@@ -167,12 +187,33 @@ const VideoCard = ({ video, isOptions = false }) => {
                     d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
                   />
                 </svg>
+
                 {openOptionsId === video?._id && (
-                  <div className="absolute z-50 right-6 top-0 rounded-lg bg-gray-50  border-gray-400 p-3 shadow-lg">
-                    <ul className="w-full space-y-2">
+                  <div
+                    ref={optionsRef}
+                    className="
+                      absolute z-50 right-6 top-0
+                      rounded-lg 
+                      bg-[#F8FAFC] dark:bg-[#1e293b]
+                      border border-[#E2E8F0] dark:border-[#334155]
+                      p-3 
+                      shadow-2xl
+                      dark:shadow-[0_0_15px_#00FFF7]
+                      font-mono
+                      min-w-[140px]
+                    "
+                  >
+                    <ul className="space-y-2">
                       <li
                         onClick={() => handleVideoUpdate(video)}
-                        className="bg-amber-500 text-white p-2 rounded-full hover:bg-amber-700 transition duration-200 flex items-center gap-2"
+                        className="
+                          bg-[#3A86FF] text-white 
+                          p-2 rounded-lg 
+                          hover:bg-[#265ef0] 
+                          transition duration-200 
+                          flex items-center gap-2
+                          cursor-pointer
+                        "
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -190,10 +231,16 @@ const VideoCard = ({ video, isOptions = false }) => {
                         </svg>
                         Update
                       </li>
-
                       <li
                         onClick={() => handleDeleteClick(video)}
-                        className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition duration-200 flex items-center gap-2"
+                        className="
+                          bg-[#FF006E] text-white 
+                          p-2 rounded-lg 
+                          hover:bg-[#e6005c] 
+                          transition duration-200 
+                          flex items-center gap-2
+                          cursor-pointer
+                        "
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -219,12 +266,12 @@ const VideoCard = ({ video, isOptions = false }) => {
           </div>
         </div>
       </div>
-      {/* Delete Confirmation Modal */}
       <DeleteModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)} // Close modal
-        onConfirm={handleDeleteConfirm} // Handle confirmation
-        videoTitle={videoToDelete ? videoToDelete.title : ""} // Pass video title to modal
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        videoTitle={videoToDelete ? videoToDelete.title : ""}
+        videoId={video?._id}
       />
     </div>
   );

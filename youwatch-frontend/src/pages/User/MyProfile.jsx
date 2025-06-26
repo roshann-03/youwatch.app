@@ -14,7 +14,6 @@ const MyProfile = () => {
   const navigate = useNavigate();
 
   // Check for theme preference and set default to "dark"
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
   const fetchChannelDetails = async () => {
     try {
@@ -42,7 +41,7 @@ const MyProfile = () => {
   }, []);
 
   return (
-    <div className="flex dark:bg-gray-950 justify-center items-center min-h-screen lg:p-3 sm:p-3 xl:p-3 md:p-3">
+    <div className="flex dark:bg-gray-950 justify-center items-center min-h-screen lg:p-3 sm:p-3 xl:p-3 md:p-3 w-full ">
       <div className="w-full max-w-4xl dark:bg-gray-900 bg-gray-100 lg:rounded-xl sm:rounded-xl md:rounded-xl xl:rounded-xl shadow-2xl overflow-hidden">
         {/* Banner */}
         <div className="relative h-56 sm:h-72 dark:bg-gradient-to-t bg-gradient-to-t from-teal-100 dark:from-teal-700 to-transparent">

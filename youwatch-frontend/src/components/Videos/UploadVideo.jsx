@@ -25,7 +25,6 @@ const UploadVideo = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Create FormData
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
@@ -35,15 +34,12 @@ const UploadVideo = () => {
 
     try {
       await axiosFormData.post("/videos", formData);
-
-      // Notify success
       notify("Video uploaded successfully!", "success");
       setTitle("");
       setDescription("");
       setVideoFile(null);
       setThumbnail(null);
     } catch (error) {
-      // Notify error
       notify("Failed to upload video");
       console.error("Upload error:", error);
     } finally {
@@ -52,75 +48,116 @@ const UploadVideo = () => {
   };
 
   return (
-    <div className="relative flex justify-center items-center min-h-screen dark:bg-gradient-to-r dark:from-slate-800 dark:to-slate-900 bg-gradient-to-r from-indigo-200 to-purple-300 lg:p-4 sm:px-8">
-      {/* Upload Video Feature */}
-      <div className="bg-white dark:bg-zinc-600  p-6 rounded-lg shadow-xl w-full sm:w-full lg:w-full flex flex-col sm:flex-row sm:space-y-0 justify-between items-center sm:space-x-6 z-10">
-        {/* Left Section: Video Preview */}
-        <div className="w-full sm:w-1/2 flex flex-col justify-center items-center dark:bg-zinc-600 bg-gray-100 p-4">
-          {/* Video Preview */}
+    <div
+      className="relative flex justify-center items-center min-h-screen
+      bg-gradient-to-r from-cyan-600 to-cyan-800
+      dark:bg-gradient-to-r dark:from-[#010912] dark:via-[#05182a] dark:to-[#0f193b]
+      p-4"
+    >
+      <div
+        className="bg-white dark:bg-[#071423] dark:border dark:border-cyan-500
+        p-6 rounded-xl dark:shadow-xl w-full max-w-5xl
+        flex flex-col sm:flex-row sm:space-y-0 justify-between items-center sm:space-x-8 z-10"
+      >
+        {/* Left: Video Preview */}
+        <div
+          className="w-full sm:w-1/2 flex flex-col justify-center items-center
+          dark:bg-[#071423] bg-gray-100 p-4 rounded-lg
+          border-2 border-transparent dark:border-cyan-600
+          dark:shadow-[0_0_15px_#00fff7]"
+        >
           {videoFile ? (
-            <div className="w-full   overflow-hidden relative bg-black rounded-lg">
+            <div className="w-full overflow-hidden relative bg-black rounded-lg border-2 border-cyan-600 dark:shadow-[0_0_25px_#00fff7]">
               <video
                 src={URL.createObjectURL(videoFile)}
                 controls
-                className="w-full h-full object-cover"
-              ></video>
+                className="w-full h-full object-cover rounded-lg"
+              />
             </div>
           ) : (
-            <div className="text-center dark:text-white text-gray-600">
+            <div className="text-center dark:text-cyan-400 text-gray-600 font-mono">
               <p>Select a video file to preview.</p>
             </div>
           )}
 
           {thumbnail ? (
-            <div className="mt-4 w-full h-48 overflow-hidden relative">
+            <div className="mt-4 w-full h-48 overflow-hidden relative rounded-lg border-2 border-cyan-600 dark:shadow-[0_0_20px_#00fff7]">
               <img
                 src={URL.createObjectURL(thumbnail)}
                 alt="Thumbnail Preview"
-                className="w-full h-full object-cover rounded-lg border-2 border-gray-300"
+                className="w-full h-full object-cover rounded-lg"
               />
             </div>
           ) : (
-            <div className="text-center dark:text-white text-gray-600">
+            <div className="text-center dark:text-cyan-400 text-gray-600 font-mono">
               <p>Select a thumbnail file to preview.</p>
             </div>
           )}
         </div>
 
-        {/* Right Section: Form Inputs */}
-        <form onSubmit={handleUpload} className="w-full sm:w-1/2 space-y-3">
-          <h2 className="text-3xl font-semibold dark:text-white text-gray-800 text-center mb-6">
+        {/* Right: Form Inputs */}
+        <form
+          onSubmit={handleUpload}
+          className="w-full sm:w-1/2 space-y-5"
+          autoComplete="off"
+        >
+          <h2
+            className="text-4xl font-extrabold text-center
+            dark:text-cyan-400 text-cyan-900 font-mono
+            tracking-wide dark:drop-shadow-[0_0_10px_rgba(0,255,247,0.7)]"
+          >
             Upload Your Video
           </h2>
 
-          {/* Video Title Input */}
           <div className="relative">
             <input
               type="text"
               placeholder="Video Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-4 text-gray-800 dark:text-white dark:bg-gray-800  bg-gray-50 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-lg transition-all duration-300"
+              className="w-full p-4
+                bg-gray-50 dark:bg-[#071423]
+                text-gray-900 dark:text-cyan-300
+                font-mono
+                rounded-lg border-2 border-gray-300 dark:border-cyan-600
+                focus:outline-none focus:ring-2 focus:ring-cyan-500
+                dark:shadow-[0_0_15px_rgba(0,255,247,0)]
+                focus:shadow-[0_0_15px_rgba(0,255,247,0.8)]
+                transition duration-300"
               required
+              spellCheck={false}
+              autoComplete="off"
             />
           </div>
 
-          {/* Video Description Input */}
           <div className="relative">
             <textarea
               placeholder="Video Description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-4 text-gray-800 dark:text-white dark:bg-gray-800  bg-gray-50 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-lg transition-all duration-300"
+              className="w-full p-4
+                bg-gray-50 dark:bg-[#071423]
+                text-gray-900 dark:text-cyan-300
+                font-mono
+                rounded-lg border-2 border-gray-300 dark:border-cyan-600
+                focus:outline-none focus:ring-2 focus:ring-cyan-500
+                dark:shadow-[0_0_15px_rgba(0,255,247,0)]
+                focus:shadow-[0_0_15px_rgba(0,255,247,0.8)]
+                transition duration-300
+                resize-none
+                min-h-[100px]"
               required
+              spellCheck={false}
+              autoComplete="off"
             />
           </div>
 
-          {/* Video File Input */}
-          <div className="mb-6">
+          {/* Video File */}
+          <div>
             <label
               htmlFor="videoFile"
-              className="block dark:text-gray-50 text-gray-600 mb-2"
+              className="block mb-2 font-semibold
+                dark:text-cyan-300 text-gray-700 font-mono"
             >
               Upload Video
             </label>
@@ -128,12 +165,18 @@ const UploadVideo = () => {
             <div className="flex items-center space-x-4">
               <label
                 htmlFor="videoFile"
-                className="cursor-pointer inline-block text-sm font-semibold px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition"
+                className="cursor-pointer
+                  px-5 py-2 rounded-full
+                  bg-cyan-600 text-white font-mono font-semibold
+                  hover:bg-cyan-700
+                  transition
+                  dark:shadow-[0_0_10px_rgba(0,255,247,0.8)]
+                  hover:shadow-[0_0_20px_rgba(0,255,247,1)]
+                "
               >
                 Choose Video
               </label>
-
-              <span className="text-sm text-gray-500 dark:text-white">
+              <span className="text-sm text-gray-500 dark:text-cyan-300 font-mono">
                 {videoFile ? videoFile.name : "No file chosen"}
               </span>
             </div>
@@ -159,12 +202,12 @@ const UploadVideo = () => {
             />
           </div>
 
-          {/* Thumbnail Input */}
-
-          <div className="mb-6">
+          {/* Thumbnail */}
+          <div>
             <label
               htmlFor="thumbnail"
-              className="block dark:text-gray-50 text-gray-600 mb-2"
+              className="block mb-2 font-semibold
+                dark:text-cyan-300 text-gray-700 font-mono"
             >
               Upload Thumbnail
             </label>
@@ -172,12 +215,18 @@ const UploadVideo = () => {
             <div className="flex items-center space-x-4">
               <label
                 htmlFor="thumbnail"
-                className="cursor-pointer inline-block text-sm font-semibold px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition"
+                className="cursor-pointer
+                  px-5 py-2 rounded-full
+                  bg-cyan-600 text-white font-mono font-semibold
+                  hover:bg-cyan-700
+                  transition
+                  dark:shadow-[0_0_10px_rgba(0,255,247,0.8)]
+                  hover:shadow-[0_0_20px_rgba(0,255,247,1)]
+                "
               >
                 Choose Thumbnail
               </label>
-
-              <span className="text-sm text-gray-500 dark:text-white">
+              <span className="text-sm text-gray-500 dark:text-cyan-300 font-mono">
                 {thumbnail ? thumbnail.name : "No file chosen"}
               </span>
             </div>
@@ -193,7 +242,7 @@ const UploadVideo = () => {
                 if (file) {
                   const sizeInMB = file.size / (1024 * 1024);
                   if (sizeInMB > 20) {
-                    toast.error("File size exceeds limit: 100MB");
+                    toast.error("Thumbnail size exceeds limit: 20MB");
                     setThumbnail(null);
                     return;
                   }
@@ -202,13 +251,24 @@ const UploadVideo = () => {
               }}
             />
           </div>
-          {/* Submit Button */}
+
+          {/* Submit */}
           <button
             type="submit"
-            className={`w-full bg-indigo-600 text-white p-3 rounded-lg transition-opacity duration-200 ${
-              loading ? "opacity-50 cursor-not-allowed" : "hover:bg-indigo-700"
-            }`}
             disabled={loading}
+            className={`w-full
+              bg-cyan-600
+              text-white
+              font-mono font-semibold
+              p-4 rounded-lg
+              transition
+              duration-300
+              ${
+                loading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-cyan-700 dark:shadow-[0_0_15px_rgba(0,255,247,0.9)]"
+              }
+            `}
           >
             {loading ? "Uploading..." : "Upload Video"}
           </button>
@@ -217,19 +277,33 @@ const UploadVideo = () => {
 
       {/* Loading Overlay */}
       {loading && (
-        <div className="absolute inset-0 bg-black bg-opacity-60 flex justify-center items-center z-20">
+        <div className="absolute inset-0 bg-black bg-opacity-80 flex justify-center items-center z-20">
           <div className="text-center">
-            <h3 className="text-4xl font-bold text-white mb-4">Uploading...</h3>
-            <div className="flex space-x-4">
-              <div className="dot dot-1 bg-indigo-600 w-12 h-12 rounded-full animate-bounce"></div>
-              <div className="dot dot-2 bg-indigo-600 w-12 h-12 rounded-full animate-bounce200"></div>
-              <div className="dot dot-3 bg-indigo-600 w-12 h-12 rounded-full animate-bounce400"></div>
+            <h3
+              className="text-5xl font-extrabold text-cyan-400 mb-6 font-mono
+              dark:drop-shadow-[0_0_20px_rgba(0,255,247,0.8)]
+              animate-pulse"
+            >
+              Uploading...
+            </h3>
+            <div className="flex space-x-6 justify-center">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-16 h-16 rounded-full bg-cyan-500
+                    animate-bounce
+                    delay-[${i * 200}ms]
+                    dark:shadow-[0_0_15px_rgba(0,255,247,0.9)]
+                    `}
+                  style={{ animationDelay: `${i * 200}ms` }}
+                />
+              ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* Toast Container for notifications */}
+      {/* Toast notifications */}
       <ToastContainer
         position="top-right"
         autoClose={5000}

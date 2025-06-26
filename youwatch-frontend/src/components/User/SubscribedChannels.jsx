@@ -13,7 +13,6 @@ const SubscribedChannels = () => {
   const fetchSubscribedChannels = async () => {
     try {
       const response = await axiosJSON.get(`subscriptions/subscribed-channels`);
-
       setSubscribedChannels(response.data.data);
       setSubscribedCount(response.data.data.length);
     } catch (err) {
@@ -28,7 +27,9 @@ const SubscribedChannels = () => {
   }, []);
 
   if (loading) {
-    return <div className="text-white text-center">Loading...</div>;
+    return (
+      <div className="text-white text-center animate-pulse">Loading...</div>
+    );
   }
 
   if (error) {
@@ -36,31 +37,34 @@ const SubscribedChannels = () => {
   }
 
   return (
-    <div className=" dark:bg-gradient-to-br dark:from-slate-800 dark:via-zinc-700 dark:to-gray-800    bg-gradient-to-br from-purple-200 via-pink-200 to-red-300 min-h-screen p-8">
+    <div className="min-h-screen p-8 bg-gradient-to-br from-purple-100 via-pink-100 to-red-200 dark:from-[#0f0c29] dark:via-[#302b63] dark:to-[#24243e] transition-all duration-500 font-sans">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-extrabold dark:text-white mb-6">
+        <h1 className="text-4xl font-extrabold dark:text-white mb-6 font-futuristic tracking-wider">
           Welcome, {user?.fullName}
         </h1>
-        <p className="text-xl dark:text-white mb-8">
+        <p className="text-xl dark:text-gray-300 text-gray-800 mb-8">
           You are subscribed to{" "}
-          <span className="font-semibold">{subscribedCount}</span> channels
+          <span className="font-semibold text-purple-700 dark:text-cyan-400">
+            {subscribedCount}
+          </span>{" "}
+          channel{subscribedCount > 1 ? "s" : ""}
         </p>
 
-        {/* Subscribed Channels List */}
-        <div className="bg-white dark:bg-stone-800  p-6 rounded-2xl shadow-2xl">
+        {/* Channel List */}
+        <div className="bg-whitep-6 rounded-2xl shadow-xl border dark:border-[#00ffff33] backdrop-blur-sm">
           {subscribedChannels.length === 0 ? (
-            <p className="text-center dark:text-white text-gray-500">
+            <p className="text-center dark:text-gray-300 text-gray-500">
               No subscribed channels found.
             </p>
           ) : (
-            <ul>
+            <ul className="space-y-6">
               {subscribedChannels.map((channel) => (
                 <li
                   key={channel.channel._id}
                   onClick={() =>
                     navigate(`/channel/${channel?.channel?.username}`)
                   }
-                  className="cursor-pointer mb-6 p-4 border-b dark:border-gray-600  border-gray-500 dark:hover:bg-gray-900 hover:bg-gray-200 transition-all rounded-xl"
+                  className="cursor-pointer p-4 rounded-xl transition-all border dark:border-cyan-500 border-gray-300 hover:scale-[1.02] hover:shadow-lg dark:hover:shadow-cyan-500/50 hover:bg-gray-100 dark:hover:bg-[#0e0e2e] bg-white dark:bg-[#111122]"
                 >
                   <div className="flex items-center gap-6">
                     <img
@@ -68,18 +72,18 @@ const SubscribedChannels = () => {
                         channel.channel.avatar || "/default-channel-logo.png"
                       }
                       alt={channel.channel.username}
-                      className="w-16 h-16 rounded-full object-cover"
+                      className="w-16 h-16 rounded-full object-cover border-2 dark:border-cyan-400 border-purple-400 shadow-md"
                     />
                     <div className="flex-1">
-                      <h3 className="text-2xl font-semibold dark:text-white text-gray-800">
+                      <h3 className="text-2xl font-semibold text-gray-800 dark:text-white font-exo">
                         {channel.channel.username}
                       </h3>
-                      <p className="dark:text-gray-300 text-gray-500">
+                      <p className="text-gray-600 dark:text-gray-400">
                         {channel.channel.description ||
                           "No description available"}
                       </p>
                     </div>
-                    <button className="text-white bg-gradient-to-r from-indigo-600 to-pink-500 rounded-full px-4 py-2 hover:bg-indigo-700 transition-all">
+                    <button className="bg-gradient-to-r from-cyan-500 to-pink-500 text-white px-4 py-2 rounded-full font-semibold shadow-lg hover:from-pink-500 dark:hover:to-cyan-500 transition-all duration-100">
                       Visit Channel
                     </button>
                   </div>

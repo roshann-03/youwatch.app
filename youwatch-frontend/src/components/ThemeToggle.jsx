@@ -1,30 +1,26 @@
 import { useState, useEffect } from "react";
-import { FaMoon, FaSun } from "react-icons/fa";
+import { RiMoonClearFill, RiSunFill } from "react-icons/ri";
+
 const ThemeToggle = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Check the theme in localStorage on page load
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === "dark");
-      if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark"); // Enable dark mode
-      } else {
-        document.documentElement.classList.remove("dark"); // Disable dark mode
-      }
+    const prefersDark = savedTheme === "dark";
+    setIsDarkMode(prefersDark);
+
+    if (prefersDark) {
+      document.documentElement.classList.add("dark");
     } else {
-      // Default to light theme
-      setIsDarkMode(false);
+      document.documentElement.classList.remove("dark");
     }
   }, []);
 
   const toggleTheme = () => {
+    const newTheme = isDarkMode ? "light" : "dark";
     setIsDarkMode(!isDarkMode);
-    const newTheme = !isDarkMode ? "dark" : "light";
     localStorage.setItem("theme", newTheme);
 
-    // Apply the theme class to the root element
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
@@ -33,12 +29,28 @@ const ThemeToggle = () => {
   };
 
   return (
-    <button 
+    <button
       onClick={toggleTheme}
-      className="p-2 rounded-full transition-all duration-300 border border-gray-800  bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+      aria-label="Toggle Theme"
+      className={`group p-3 rounded-full border-2 transition-all duration-500
+        ${
+          isDarkMode
+            ? "bg-black border-cyan-400 hover:border-cyan-300 shadow-[0_0_12px_#00FFF7]"
+            : "bg-white border-gray-300 hover:border-blue-400 shadow-sm"
+        }
+      `}
     >
-      {/* Replace emojis with React icons */}
-      {isDarkMode ? <FaMoon /> : <FaSun />}
+      {isDarkMode ? (
+        <RiSunFill
+          className="text-yellow-300 group-hover:scale-110 transition-transform duration-300"
+          size={24}
+        />
+      ) : (
+        <RiMoonClearFill
+          className="text-blue-700 group-hover:scale-110 transition-transform duration-300"
+          size={24}
+        />
+      )}
     </button>
   );
 };
