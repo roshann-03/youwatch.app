@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import VideoCard from "../../components/Videos/VideoCard";
 import { axiosJSON } from "../../api/axiosInstances";
 import { useNavigate } from "react-router-dom";
-import DeleteModal from "@/components/modals/DeleteModal"; // Make sure this path is correct
+import DeleteModal from "../../components/Modals/DeleteModal"; // Make sure this path is correct
 
 const MyVideos = () => {
   const [videos, setVideos] = useState([]);
