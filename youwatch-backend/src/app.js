@@ -22,9 +22,20 @@ app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin:
+      process.env.NODE_ENV === "production"
+        ? process.env.CORS_ORIGIN
+        : process.env.DEV_CORS_ORIGIN,
     credentials: true,
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
+  })
+);
+
+app.options(
+  "*",
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
   })
 );
 
