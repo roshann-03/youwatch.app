@@ -10,34 +10,33 @@ import { rateLimit } from "express-rate-limit";
 
 const app = express();
 
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    limit: 100,
-  })
-);
+const limiter = rateLimit({
+  windowsMs: 60 * 1000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    status: 429,
+    message: "Too many requests, please try again after a minute.",
+  },
+});
+app.use(limiter);
 
 app.use(morgan("dev"));
 app.set("trust proxy", 1);
 
-app.use(
-  cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? process.env.CORS_ORIGIN
-        : process.env.DEV_CORS_ORIGIN,
-    credentials: true,
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" for production, "Lax" for development
-  })
-);
+const corsOptions = {
+  origin:
+    process.env.NODE_ENV === "production"
+      ? process.env.CORS_ORIGIN
+      : process.env.DEV_CORS_ORIGIN,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
-app.options(
-  "*",
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight for all
 
 import { admin, adminRouter } from "./admin/admin.js";
 app.use(admin.options.rootPath, adminRouter);

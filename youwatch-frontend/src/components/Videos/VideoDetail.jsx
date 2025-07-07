@@ -5,7 +5,7 @@ import CommentSection from "../CommentSection";
 import Subscription from "../User/Subscription";
 import { BiLike, BiDislike, BiSolidLike, BiSolidDislike } from "react-icons/bi";
 import { axiosJSON } from "../../api/axiosInstances";
-import CustomVideoPlayer from "./CustomVideoPlayer";
+import CustomVideoPlayer from "./CustomVideoPlayer.jsx";
 
 const VideoDetail = () => {
   const { id } = useParams();
@@ -157,9 +157,9 @@ const VideoDetail = () => {
   const loadMoreDescription = () => setIsDescriptionOpen((prev) => !prev);
 
   return (
-    <div className="flex flex-col w-full justify-center items-center dark:bg-black dark:text-gray-50 bg-white text-gray-900 transition-colors duration-500">
-      <div className="relative w-full max-w-6xl">
-        <div className="video-container flex justify-center w-full dark:bg-black relative">
+    <div className="flex flex-col w-full justify-center items-center dark:bg-black dark:text-gray-50 bg-white text-gray-900 transition-colors duration-500 ">
+      <div className="relative w-full ">
+        <div className="video-container flex justify-center  w-full dark:bg-black relative ">
           <CustomVideoPlayer video={video} />
         </div>
 

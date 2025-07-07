@@ -120,11 +120,7 @@ const App = () => {
   }
 
   return (
-    <div
-      className={`min-h-screen bg-gray-100 transition-all duration-300 ${
-        isLoggedIn ? "ml-16" : ""
-      }`}
-    >
+    <>
       {isLoggedIn ? (
         <LoggedInNav
           onLogout={handleLogout}
@@ -134,126 +130,133 @@ const App = () => {
       ) : (
         <LoggedOutNav />
       )}
+
       {isLoggedIn ? (
         <SearchResultPortal results={["lalala"]} visible={true} />
       ) : (
         ""
       )}
-      <Routes>
-        {/* Redirect logged-in users away from login and register pages */}
-        <Route
-          path="/register"
-          element={
-            <RedirectedRoute isAuthenticated={isLoggedIn}>
-              <Register />
-            </RedirectedRoute>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <RedirectedRoute isAuthenticated={isLoggedIn}>
-              <Login onLogin={handleLogin} />
-            </RedirectedRoute>
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <PrivateRoute isAuthenticated={isLoggedIn}>
-              <Dashboard onLogout={handleLogout} />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/otp-verification" element={<OtpVerification />} />
-        <Route
-          path="/set-password/"
-          element={
-            <RedirectedRoute isAuthenticated={isLoggedIn}>
-              <SetPassword />
-            </RedirectedRoute>
-          }
-        />
+      <div
+        className={`min-h-screen bg-gray-100 transition-all duration-300 ${
+          isLoggedIn ? "ml-16" : ""
+        }`}
+      >
+        <Routes>
+          {/* Redirect logged-in users away from login and register pages */}
+          <Route
+            path="/register"
+            element={
+              <RedirectedRoute isAuthenticated={isLoggedIn}>
+                <Register />
+              </RedirectedRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <RedirectedRoute isAuthenticated={isLoggedIn}>
+                <Login onLogin={handleLogin} />
+              </RedirectedRoute>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <Dashboard onLogout={handleLogout} />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/otp-verification" element={<OtpVerification />} />
+          <Route
+            path="/set-password/"
+            element={
+              <RedirectedRoute isAuthenticated={isLoggedIn}>
+                <SetPassword />
+              </RedirectedRoute>
+            }
+          />
 
-        <Route
-          path="/upload"
-          element={
-            <PrivateRoute isAuthenticated={isLoggedIn}>
-              <UploadVideo />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/video/:id" element={<VideoDetail />} />
-        <Route path="/channel/:username" element={<ChannelMenu />} />
+          <Route
+            path="/upload"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <UploadVideo />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/video/:id" element={<VideoDetail />} />
+          <Route path="/channel/:username" element={<ChannelMenu />} />
 
-        {/* Secured Routes */}
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+          {/* Secured Routes */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute isAuthenticated={isLoggedIn}>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/myprofile"
-          element={
-            <PrivateRoute isAuthenticated={isLoggedIn}>
-              <MyProfile />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/my-videos"
-          element={
-            <PrivateRoute isAuthenticated={isLoggedIn}>
-              <MyVideos />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/update-video"
-          element={
-            <PrivateRoute isAuthenticated={isLoggedIn}>
-              <VideoUpdateForm />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/subscribed-channels"
-          element={
-            <PrivateRoute isAuthenticated={isLoggedIn}>
-              <SubscribedChannels />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/posts"
-          element={
-            <PrivateRoute isAuthenticated={isLoggedIn}>
-              <Home />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/posts/all"
-          element={
-            <PrivateRoute isAuthenticated={isLoggedIn}>
-              <AllTweets />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/oauth-success"
-          element={<OAuthSuccess onLogin={handleLogin} />}
-        />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/myprofile"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <MyProfile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/my-videos"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <MyVideos />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/update-video"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <VideoUpdateForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/subscribed-channels"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <SubscribedChannels />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/posts"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/posts/all"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <AllTweets />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/oauth-success"
+            element={<OAuthSuccess onLogin={handleLogin} />}
+          />
 
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </div>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </div>
+    </>
   );
 };
 

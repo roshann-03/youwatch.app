@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import {
   FaPlay,
   FaPause,
@@ -10,81 +10,153 @@ import { axiosJSON } from "../../api/axiosInstances";
 
 export default function CustomVideoPlayer({ video }) {
   const videoRef = useRef(null);
+  const containerRef = useRef(null);
   const viewed = useRef(false);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
 
-  useEffect(() => {
+  const formatTime = (time = 0) =>
+    `${String(Math.floor(time / 60)).padStart(2, "0")}:${String(
+      Math.floor(time % 60)
+    ).padStart(2, "0")}`;
+
+  const togglePlay = useCallback(() => {
     const vid = videoRef.current;
     if (!vid) return;
-    const attemptPlay = async () => {
-      try {
-        await vid.play();
-        setIsPlaying(true);
-      } catch {
-        setIsPlaying(false);
-      }
-    };
-    attemptPlay();
-  }, []);
 
-  const togglePlay = () => {
-    const vid = videoRef.current;
     if (vid.paused) {
-      vid.play();
-      setIsPlaying(true);
+      vid
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {});
     } else {
       vid.pause();
       setIsPlaying(false);
     }
-  };
+  }, []);
 
-  const toggleMute = () => {
+  const toggleMute = useCallback(() => {
     const vid = videoRef.current;
+    if (!vid) return;
+
     vid.muted = !vid.muted;
     setIsMuted(vid.muted);
-  };
+  }, []);
 
-  const handleVolume = (e) => {
+  const handleVolume = useCallback((e) => {
     const newVolume = parseFloat(e.target.value);
-    videoRef.current.volume = newVolume;
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    vid.volume = newVolume;
     setVolume(newVolume);
     setIsMuted(newVolume === 0);
-  };
+  }, []);
 
-  const handleProgress = (e) => {
+  const handleProgress = useCallback((e) => {
     const newTime = parseFloat(e.target.value);
-    videoRef.current.currentTime = newTime;
-    setProgress(newTime);
-  };
-
-  const toggleFullscreen = () => {
-    const player = videoRef.current.parentElement;
-    if (!document.fullscreenElement) {
-      player.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  };
-
-  const seek = (seconds) => {
     const vid = videoRef.current;
-    vid.currentTime = Math.min(
-      Math.max(vid.currentTime + seconds, 0),
-      duration
-    );
-  };
+    if (!vid) return;
+
+    vid.currentTime = newTime;
+    setProgress(newTime);
+  }, []);
+
+  const toggleFullscreen = useCallback(async () => {
+    const container = containerRef.current;
+    try {
+      if (!document.fullscreenElement) {
+        await container?.requestFullscreen?.();
+        screen.orientation?.lock?.("landscape").catch(() => {});
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen?.();
+        screen.orientation?.unlock?.();
+        setIsFullscreen(false);
+      }
+    } catch (e) {
+      console.warn("Fullscreen error:", e);
+    }
+  }, []);
+
+  const seek = useCallback(
+    (seconds) => {
+      const vid = videoRef.current;
+      if (!vid) return;
+
+      const newTime = Math.min(
+        Math.max(vid.currentTime + seconds, 0),
+        duration
+      );
+      vid.currentTime = newTime;
+      setProgress(newTime);
+    },
+    [duration]
+  );
 
   useEffect(() => {
     const vid = videoRef.current;
-    const updateTime = () => setProgress(vid.currentTime);
+    if (!vid) return;
+
+    const updateProgress = () => setProgress(vid.currentTime);
     const updateDuration = () => setDuration(vid.duration);
 
-    const handleKeyDown = (e) => {
+    vid.addEventListener("timeupdate", updateProgress);
+    vid.addEventListener("loadedmetadata", updateDuration);
+
+    return () => {
+      vid.removeEventListener("timeupdate", updateProgress);
+      vid.removeEventListener("loadedmetadata", updateDuration);
+    };
+  }, []);
+
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    let watchInterval;
+    let watchedSeconds = 0;
+    let lastTime = 0;
+
+    const trackTime = () => {
+      if (Math.abs(vid.currentTime - lastTime) < 1.2) {
+        watchedSeconds += 1;
+      }
+      lastTime = vid.currentTime;
+
+      if (watchedSeconds >= 10 && !viewed.current) {
+        viewed.current = true;
+        axiosJSON.post(`/videos/track-view/${video._id}`).catch(console.error);
+      }
+    };
+
+    const handlePlay = () => {
+      watchInterval = setInterval(trackTime, 1000);
+    };
+    const clearWatch = () => clearInterval(watchInterval);
+
+    vid.addEventListener("play", handlePlay);
+    vid.addEventListener("pause", clearWatch);
+    vid.addEventListener("ended", clearWatch);
+
+    return () => {
+      clearInterval(watchInterval);
+      vid.removeEventListener("play", handlePlay);
+      vid.removeEventListener("pause", clearWatch);
+      vid.removeEventListener("ended", clearWatch);
+    };
+  }, [video._id]);
+
+  useEffect(() => {
+    const handleKey = (e) => {
       if (e.target.tagName === "INPUT") return;
+
       switch (e.key.toLowerCase()) {
         case " ":
           e.preventDefault();
@@ -107,141 +179,105 @@ export default function CustomVideoPlayer({ video }) {
       }
     };
 
-    vid.addEventListener("timeupdate", updateTime);
-    vid.addEventListener("loadedmetadata", updateDuration);
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      vid.removeEventListener("timeupdate", updateTime);
-      vid.removeEventListener("loadedmetadata", updateDuration);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [duration]);
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [togglePlay, toggleMute, toggleFullscreen, seek]);
 
   useEffect(() => {
-    const vid = videoRef.current;
-    let watchedTime = 0;
-    let lastTime = 0;
-    let interval;
+    let hideControlsTimer;
+    if (isPlaying) {
+      setShowControls(true);
+      hideControlsTimer = setTimeout(() => setShowControls(false), 4000);
+    } else {
+      setShowControls(true);
+    }
+    return () => clearTimeout(hideControlsTimer);
+  }, [isPlaying]);
 
-    const trackWatchTime = () => {
-      const currentTime = vid.currentTime;
-      if (Math.abs(currentTime - lastTime) < 1.2) {
-        watchedTime += 1;
+ return (
+  <div
+    ref={containerRef}
+    className={`relative w-full mx-auto overflow-hidden bg-black ${
+      isFullscreen ? "fixed inset-0 z-50" : "rounded-md shadow-md"
+    }`}
+    style={{ fontFamily: "'Inter', sans-serif" }}
+    onMouseMove={() => {
+      if (isPlaying) {
+        setShowControls(true);
+        clearTimeout(window.__hideControlsTimer);
+        window.__hideControlsTimer = setTimeout(() => setShowControls(false), 3000);
       }
-      lastTime = currentTime;
+    }}
+  >
+    <video
+      ref={videoRef}
+      className={`w-full h-auto transition-transform bg-black cursor-pointer ${
+        isFullscreen ? "absolute inset-0 h-full w-full object-contain sm:rotate-0 rotate-90" : ""
+      }`}
+      src={video.videoFile}
+      onClick={togglePlay}
+      onPause={() => setIsPlaying(false)}
+      onPlay={() => setIsPlaying(true)}
+      controls={false}
+    />
 
-      if (watchedTime >= 10 && !viewed.current) {
-        viewed.current = true;
-        axiosJSON
-          .post(`/videos/track-view/${video._id}`)
-          .catch((err) => console.error("Error tracking view:", err));
-      }
-    };
-
-    const handlePlay = () => {
-      interval = setInterval(trackWatchTime, 1000);
-    };
-
-    const handlePause = () => {
-      clearInterval(interval);
-    };
-
-    vid.addEventListener("play", handlePlay);
-    vid.addEventListener("pause", handlePause);
-    vid.addEventListener("ended", handlePause);
-
-    return () => {
-      clearInterval(interval);
-      vid.removeEventListener("play", handlePlay);
-      vid.removeEventListener("pause", handlePause);
-      vid.removeEventListener("ended", handlePause);
-    };
-  }, [video._id]);
-
-  const formatTime = (time = 0) => {
-    const minutes = Math.floor(time / 60)
-      .toString()
-      .padStart(2, "0");
-    const seconds = Math.floor(time % 60)
-      .toString()
-      .padStart(2, "0");
-    return `${minutes}:${seconds}`;
-  };
-
-  return (
-    <div
-      className="relative w-full max-w-4xl mx-auto overflow-hidden rounded-xl
-        bg-white shadow-lg dark:bg-[#0b0f1c] dark:shadow-[0_0_20px_#00fff7]"
-      style={{ fontFamily: "'Inter', sans-serif" }}
-    >
-      <video
-        ref={videoRef}
-        className="w-full h-auto cursor-pointer bg-black"
-        src={video.videoFile}
+    {/* Overlay Play Icon when paused */}
+    {!isPlaying && (
+      <button
         onClick={togglePlay}
-        onPause={() => setIsPlaying(false)}
-        controls={false}
+        className="absolute inset-0 flex items-center justify-center text-white text-5xl sm:text-6xl bg-black/30 hover:bg-black/50 transition"
+      >
+        <FaPlay className="drop-shadow" />
+      </button>
+    )}
+
+    {/* Controls */}
+    <div
+      className={`absolute bottom-0 left-0 right-0 transition-opacity duration-300 ${
+        showControls ? "opacity-100" : "opacity-0 pointer-events-none"
+      } bg-gradient-to-t from-black/70 via-black/40 to-transparent px-3 pb-3 pt-2`}
+    >
+      <input
+        type="range"
+        min={0}
+        max={duration}
+        step={0.1}
+        value={progress}
+        onChange={handleProgress}
+        className="w-full h-1 appearance-none rounded bg-gray-300 dark:bg-cyan-700 accent-red-500 cursor-pointer"
       />
 
-      <div
-        className="absolute bottom-0 w-full backdrop-blur-md p-4
-        bg-white/70  dark:bg-black/60 border-t
-        border-gray-200 dark:border-cyan-500 text-gray-800 dark:text-cyan-300"
-      >
-        {/* Progress Bar */}
-        <input
-          type="range"
-          min={0}
-          max={duration || 0}
-          step={0.1}
-          value={progress}
-          onChange={handleProgress}
-          className="w-full h-1 rounded-lg appearance-none cursor-pointer accent-indigo-400
-            bg-gradient-to-r from-indigo-300 to-purple-300 dark:bg-cyan-800 dark:accent-cyan-300"
-        />
-
-        <div className="flex justify-between items-center mt-3">
-          {/* Left Controls */}
-          <div className="flex gap-4 items-center">
-            <button
-              onClick={togglePlay}
-              className="text-xl p-2 rounded-full transition hover:bg-indigo-100 dark:hover:bg-cyan-900"
-            >
-              {isPlaying ? <FaPause /> : <FaPlay />}
-            </button>
-
-            <button
-              onClick={toggleMute}
-              className="text-xl p-2 rounded-full transition hover:bg-indigo-100 dark:hover:bg-cyan-900"
-            >
-              {isMuted || volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
-            </button>
-
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={volume}
-              onChange={handleVolume}
-              className="w-24 h-1 rounded-lg appearance-none accent-indigo-400 bg-gray-300 dark:bg-cyan-800"
-            />
-
-            <div className="text-sm text-gray-600 dark:text-cyan-200 font-mono select-none">
-              {formatTime(progress)} / {formatTime(duration)}
-            </div>
-          </div>
-
-          {/* Fullscreen Button */}
-          <button
-            onClick={toggleFullscreen}
-            className="text-xl p-2 rounded-full transition hover:bg-indigo-100 dark:hover:bg-cyan-900"
-          >
-            <FaExpand />
+      <div className="flex justify-between items-center mt-2 text-white text-sm sm:text-base">
+        <div className="flex items-center gap-3">
+          <button onClick={togglePlay} className="hover:text-red-500">
+            {isPlaying ? <FaPause /> : <FaPlay />}
           </button>
+
+          <button onClick={toggleMute} className="hover:text-red-500">
+            {isMuted || volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
+          </button>
+
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={volume}
+            onChange={handleVolume}
+            className="w-24 h-1 hidden sm:block cursor-pointer accent-red-500"
+          />
+
+          <span className="font-mono text-xs sm:text-sm">
+            {formatTime(progress)} / {formatTime(duration)}
+          </span>
         </div>
+
+        <button onClick={toggleFullscreen} className="hover:text-red-500">
+          <FaExpand />
+        </button>
       </div>
     </div>
-  );
+  </div>
+);
+  
 }

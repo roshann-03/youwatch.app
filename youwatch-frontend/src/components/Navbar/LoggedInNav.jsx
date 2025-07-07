@@ -62,13 +62,13 @@ const LoggedInNav = ({ onLogout, collapsed, setCollapsed }) => {
   return (
     <>
       {/* Sidebar */}
-      <div ref={sidebarRef}>
+      <div ref={sidebarRef} className="w-full">
         <aside
           className={`fixed top-[64px] left-0 h-[calc(100vh-64px)] z-40 bg-[#F8FAFC] dark:bg-[#0a0f1c] text-[#0f172a] dark:text-[#F1F5F9] shadow-xl transition-all duration-300 border-r border-[#E5E7EB] dark:border-[#1f2937] font-sans dark:font-futuristic  ${
             collapsed ? "w-16" : "w-64"
           }`}
         >
-          <div className="flex justify-end mr-3 p-2">
+          <div className="flex justify-end mr-3 p-2 ">
             <button
               onClick={() => setCollapsed(!collapsed)}
               className="text-2xl sidebar-toggle hover:scale-110 transition-transform"
@@ -78,19 +78,16 @@ const LoggedInNav = ({ onLogout, collapsed, setCollapsed }) => {
             </button>
           </div>
 
-          <div className="flex flex-col px-2 pt-2 space-y-1 overflow-y-auto custom-scrollbar max-h-[calc(100%-100px)]">
+          <div className="flex flex-col px-2 pt-2 space-y-1 overflow-y-auto custom-scrollbar max-h-[calc(100%-100px)] overflow-x-hidden">
             {menuItems.map((item) => (
               <button
                 key={item.label}
                 onClick={() => handleRoute(item.path)}
-                className={`flex items-center w-full px-3 py-3 rounded-lg hover:bg-[#CBD5E1] dark:hover:bg-[#1e293b] transition-all ${
-                  collapsed ? "justify-center" : "gap-3"
-                }`}
-                title={collapsed ? item.label : ""}
+                className={`flex items-center w-full p-3 rounded-lg hover:bg-[#CBD5E1] dark:hover:bg-[#1e293b] transition-all justify-start gap-3`}
               >
                 {item.icon}
                 {!collapsed && (
-                  <span className="text-sm font-medium text-[#2d333e] dark:text-[#00FFF7]">
+                  <span className="text-sm font-medium text-[#2d333e] dark:text-[#00FFF7] text-nowrap">
                     {item.label}
                   </span>
                 )}
@@ -101,7 +98,7 @@ const LoggedInNav = ({ onLogout, collapsed, setCollapsed }) => {
       </div>
 
       {/* Top Navbar */}
-      <header className="-ml-16 w-[100vw] h-16 bg-[#F8FAFC] text-[#0f172a] dark:bg-[#0a0f1c] dark:text-[#F1F5F9] px-3 lg:px-4 sticky top-0 z-50 flex items-center justify-between transition-all border-b border-[#E5E7EB] dark:border-[#1f2937]">
+      <header className="w-full h-16 bg-[#F8FAFC] text-[#0f172a] dark:bg-[#0a0f1c] dark:text-[#F1F5F9] px-3 lg:px-4 sticky top-0 z-50 flex items-center justify-between transition-all border-b border-[#E5E7EB] dark:border-[#1f2937]">
         <div className="flex items-center gap-3">
           <Link to="/" className="flex items-center gap-2">
             <div className="h-10 w-14 rounded-lg overflow-hidden">
