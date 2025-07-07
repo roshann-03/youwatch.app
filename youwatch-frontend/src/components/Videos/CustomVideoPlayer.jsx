@@ -194,90 +194,104 @@ export default function CustomVideoPlayer({ video }) {
     return () => clearTimeout(hideControlsTimer);
   }, [isPlaying]);
 
- return (
-  <div
-    ref={containerRef}
-    className={`relative w-full mx-auto overflow-hidden bg-black ${
-      isFullscreen ? "fixed inset-0 z-50" : "rounded-md shadow-md"
-    }`}
-    style={{ fontFamily: "'Inter', sans-serif" }}
-    onMouseMove={() => {
-      if (isPlaying) {
-        setShowControls(true);
-        clearTimeout(window.__hideControlsTimer);
-        window.__hideControlsTimer = setTimeout(() => setShowControls(false), 3000);
-      }
-    }}
-  >
-    <video
-      ref={videoRef}
-      className={`w-full h-auto transition-transform bg-black cursor-pointer ${
-        isFullscreen ? "absolute inset-0 h-full w-full object-contain sm:rotate-0 rotate-90" : ""
-      }`}
-      src={video.videoFile}
-      onClick={togglePlay}
-      onPause={() => setIsPlaying(false)}
-      onPlay={() => setIsPlaying(true)}
-      controls={false}
-    />
-
-    {/* Overlay Play Icon when paused */}
-    {!isPlaying && (
-      <button
-        onClick={togglePlay}
-        className="absolute inset-0 flex items-center justify-center text-white text-5xl sm:text-6xl bg-black/30 hover:bg-black/50 transition"
-      >
-        <FaPlay className="drop-shadow" />
-      </button>
-    )}
-
-    {/* Controls */}
+  return (
     <div
-      className={`absolute bottom-0 left-0 right-0 transition-opacity duration-300 ${
-        showControls ? "opacity-100" : "opacity-0 pointer-events-none"
-      } bg-gradient-to-t from-black/70 via-black/40 to-transparent px-3 pb-3 pt-2`}
+      ref={containerRef}
+      className={`relative w-full mx-auto overflow-hidden bg-black ${
+        isFullscreen ? "fixed inset-0 z-50" : "rounded-md shadow-md"
+      }`}
+      style={{ fontFamily: "'Inter', sans-serif" }}
+      onMouseMove={() => {
+        if (isPlaying) {
+          setShowControls(true);
+          clearTimeout(window.__hideControlsTimer);
+          window.__hideControlsTimer = setTimeout(
+            () => setShowControls(false),
+            3000
+          );
+        }
+      }}
     >
-      <input
-        type="range"
-        min={0}
-        max={duration}
-        step={0.1}
-        value={progress}
-        onChange={handleProgress}
-        className="w-full h-1 appearance-none rounded bg-gray-300 dark:bg-cyan-700 accent-red-500 cursor-pointer"
+      <video
+        ref={videoRef}
+        className={`w-full h-auto transition-transform bg-black cursor-pointer ${
+          isFullscreen
+            ? "absolute inset-0 h-full w-full object-contain sm:rotate-0 rotate-90  scale-[1.8] sm:scale-[1]"
+            : "sm:h-[85vh]"
+        }`}
+        src={video.videoFile}
+        onClick={togglePlay}
+        onPause={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+        controls={false}
       />
 
-      <div className="flex justify-between items-center mt-2 text-white text-sm sm:text-base">
-        <div className="flex items-center gap-3">
-          <button onClick={togglePlay} className="hover:text-red-500">
-            {isPlaying ? <FaPause /> : <FaPlay />}
-          </button>
-
-          <button onClick={toggleMute} className="hover:text-red-500">
-            {isMuted || volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
-          </button>
-
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.01}
-            value={volume}
-            onChange={handleVolume}
-            className="w-24 h-1 hidden sm:block cursor-pointer accent-red-500"
+      {/* Overlay Play Icon when paused */}
+      {!isPlaying && (
+        <button
+          onClick={togglePlay}
+          className="absolute inset-0 flex items-center justify-center text-white text-5xl sm:text-6xl bg-black/30 hover:bg-black/50 transition"
+        >
+          <FaPlay
+            className={`${
+              isFullscreen ? " sm:rotate-0 rotate-90" : " "
+            } drop-shadow`}
           />
-
-          <span className="font-mono text-xs sm:text-sm">
-            {formatTime(progress)} / {formatTime(duration)}
-          </span>
-        </div>
-
-        <button onClick={toggleFullscreen} className="hover:text-red-500">
-          <FaExpand />
         </button>
+      )}
+
+      {/* Controls */}
+      <div
+        className={`absolute transition-opacity duration-300 ${
+          showControls ? "opacity-100" : "opacity-0 pointer-events-none"
+        } 
+      ${
+        isFullscreen
+          ? " sm:bottom-0 sm:left-0 sm:right-0 right-[40%] bottom-[45%] w-[100vw] sm:rotate-0 rotate-90 sm:scale-[1] scale-[1.2]"
+          : " bottom-0 left-0 right-0 scale-[1] "
+      }
+      bg-gradient-to-t from-black/70 via-black/40 to-transparent px-3 pb-3 pt-2`}
+      >
+        <input
+          type="range"
+          min={0}
+          max={duration}
+          step={0.1}
+          value={progress}
+          onChange={handleProgress}
+          className="w-full h-1 appearance-none rounded bg-gray-300 dark:bg-cyan-700 accent-red-500 cursor-pointer"
+        />
+
+        <div className="flex justify-between items-center mt-2 text-white text-sm sm:text-base">
+          <div className="flex items-center gap-3">
+            <button onClick={togglePlay} className="hover:text-red-500">
+              {isPlaying ? <FaPause /> : <FaPlay />}
+            </button>
+
+            <button onClick={toggleMute} className="hover:text-red-500">
+              {isMuted || volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
+            </button>
+
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={volume}
+              onChange={handleVolume}
+              className="w-24 h-1 hidden sm:block cursor-pointer accent-red-500"
+            />
+
+            <span className="font-mono text-xs sm:text-sm">
+              {formatTime(progress)} / {formatTime(duration)}
+            </span>
+          </div>
+
+          <button onClick={toggleFullscreen} className="hover:text-red-500">
+            <FaExpand />
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
-  
+  );
 }
