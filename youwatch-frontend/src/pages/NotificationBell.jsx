@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FaBell } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { axiosJSON } from "@/api/axiosInstances";
-import { socket } from "@/utils/socket";
+import { connectSocket, getSocket } from "@/utils/socket";
 import { Link } from "react-router-dom";
 
 const NotificationBell = ({ currentUser }) => {
@@ -26,7 +26,12 @@ const NotificationBell = ({ currentUser }) => {
   useEffect(() => {
     if (!currentUser?._id) return;
 
+    connectSocket();
+
+    const socket = getSocket();
+
     socket.emit("register", currentUser._id);
+
     socket.on("new-notification", (newNotif) => {
       setNotifications((prev) => [newNotif, ...prev]);
       setIsUnread(true);

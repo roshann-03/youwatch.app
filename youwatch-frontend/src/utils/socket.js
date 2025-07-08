@@ -1,9 +1,22 @@
+// socket.js
 import { io } from "socket.io-client";
-export const socket = io(import.meta.env.VITE_SOCKET_URL, {
-  withCredentials: true,
-  transports: ["websocket", "polling"],
-});
 
-socket.on("connect_error", (err) => {
-  console.error("Socket connection error (frontend):", err.message);
-});
+let socket = null;
+
+export const getSocket = () => socket;
+
+export const connectSocket = () => {
+  if (!socket) {
+    socket = io(import.meta.env.VITE_SOCKET_URL, {
+      withCredentials: true,
+      autoConnect: false, // prevent auto connect
+      transports: ["websocket", "polling"],
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Socket connection error (frontend):", err.message);
+    });
+
+    socket.connect(); // manually connect
+  }
+};
