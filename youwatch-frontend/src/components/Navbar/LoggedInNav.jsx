@@ -22,14 +22,15 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import NotificationBell from "../../pages/NotificationBell";
 
 const LoggedInNav = ({ onLogout, collapsed, setCollapsed }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const sidebarRef = useRef(null);
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) setUser(storedUser);
   }, []);
 
@@ -124,7 +125,7 @@ const LoggedInNav = ({ onLogout, collapsed, setCollapsed }) => {
         </div>
 
         <div className="flex items-center gap-4 mr-5">
-          <ThemeToggle />
+          <NotificationBell currentUser={storedUser} />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -152,11 +153,11 @@ const LoggedInNav = ({ onLogout, collapsed, setCollapsed }) => {
                 <FaCog className="mr-2 text-[#2d333e] dark:text-[#00FFF7]" />{" "}
                 Settings{" "}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleRoute("/notifications")}>
-                {" "}
-                <FaBell className="mr-2 text-[#2d333e] dark:text-[#00FFF7]" />{" "}
-                Notifications{" "}
-              </DropdownMenuItem>
+              {
+                <DropdownMenuItem>
+                  <ThemeToggle />
+                </DropdownMenuItem>
+              }
               <DropdownMenuItem onClick={onLogout}>
                 {" "}
                 <FaSignOutAlt className="mr-2 text-[rgb(233,54,80)] dark:text-[#FF00A8]" />{" "}

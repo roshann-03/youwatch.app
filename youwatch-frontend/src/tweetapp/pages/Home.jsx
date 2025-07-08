@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <div>
-      <div className="w-full dark:bg-zinc-800 bg-zinc-300  px-20 mx-auto py-10 shadow-md ">
+      <div className="w-full dark:bg-black bg-zinc-300  sm:px-20 mx-auto py-10 shadow-md ">
         <TweetForm
           onTweetCreated={(newTweet) => setTweets([newTweet, ...tweets])}
         />

@@ -8,12 +8,12 @@ const Subscription = ({ channelId }) => {
 
   useEffect(() => {
     const fetchChannel = async () => {
+      const currentUser = JSON.parse(localStorage.getItem("user"));
       try {
         const response = await axiosJSON.get(
           `/subscriptions/c/subscription-status/${channelId}`
         );
         setSubscriptionStatus(response.data.data.isSubscribed);
-        const currentUser = JSON.parse(localStorage.getItem("user"));
         if (currentUser?._id === channelId) {
           setIsSelf(true);
         }
@@ -28,11 +28,11 @@ const Subscription = ({ channelId }) => {
   }, [channelId]);
 
   const handleSubscribe = async () => {
-    const currentUser = JSON.parse(localStorage.getItem("user"));
     if (isSelf) return;
 
     try {
       const response = await axiosJSON.post(`/subscriptions/c/${channelId}`);
+
       if (response.status === 200 || response.status === 201) {
         setSubscriptionStatus(response.data.data.isSubscribed);
       } else {

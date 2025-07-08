@@ -84,7 +84,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, isPublished } = req.body;
   // TODO: get video, upload to cloudinary, create video
   if (!title) {
     throw new ApiError(400, "Title and description are required");
@@ -110,7 +110,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     title,
     description: description || "",
     duration: uploadedVideo?.duration,
-    isPublished: true,
+    isPublished: isPublished,
     owner: req.user._id,
   });
   if (!video) {

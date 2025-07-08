@@ -29,6 +29,7 @@ import { SearchResultProvider } from "./ContextAPI/SearchResultContext";
 import SetPassword from "./pages/Auth/SetPassword";
 import { toast } from "react-toastify";
 import OfflineStatus from "./components/OfflineStatus";
+import NotificationBell from "./pages/NotificationBell";
 // PrivateRoute to protect routes
 const PrivateRoute = ({ isAuthenticated, children }) => {
   if (!isAuthenticated) {
@@ -185,8 +186,23 @@ const App = () => {
               </PrivateRoute>
             }
           />
-          <Route path="/video/:id" element={<VideoDetail />} />
-          <Route path="/channel/:username" element={<ChannelMenu />} />
+
+          <Route
+            path="/video/:id"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <VideoDetail />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/channel/:username"
+            element={
+              <PrivateRoute isAuthenticated={isLoggedIn}>
+                <ChannelMenu />
+              </PrivateRoute>
+            }
+          />
 
           {/* Secured Routes */}
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -252,7 +268,6 @@ const App = () => {
             path="/oauth-success"
             element={<OAuthSuccess onLogin={handleLogin} />}
           />
-
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

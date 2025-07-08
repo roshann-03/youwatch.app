@@ -1,4 +1,13 @@
 import { useState, useEffect } from "react";
+import {
+  FaCloudSun,
+  FaMoon,
+  FaRegSun,
+  FaSun,
+  FaThemeco,
+  FaThemeisle,
+  FaUssunnah,
+} from "react-icons/fa";
 import { RiMoonClearFill, RiSunFill } from "react-icons/ri";
 
 const ThemeToggle = () => {
@@ -29,29 +38,32 @@ const ThemeToggle = () => {
   };
 
   return (
-    <button
-      onClick={toggleTheme}
-      aria-label="Toggle Theme"
-      className={`group p-3 rounded-full border-2 transition-all duration-500
+    <>
+      <button
+        onClick={toggleTheme}
+        aria-label="Toggle Theme"
+        className={`flex gap-4 group rounded-full transition-all duration-500
         ${
           isDarkMode
-            ? "bg-black border-cyan-400 hover:border-cyan-300 shadow-[0_0_12px_#00FFF7]"
-            : "bg-white border-gray-300 hover:border-blue-400 shadow-sm"
+            ? "bg-transparent border-cyan-400 hover:border-cyan-300 shadow-sm"
+            : "bg-transparent border-gray-300 hover:border-blue-400 shadow-sm"
         }
-      `}
-    >
-      {isDarkMode ? (
-        <RiSunFill
-          className="text-yellow-300 group-hover:scale-110 transition-transform duration-300"
-          size={24}
-        />
-      ) : (
-        <RiMoonClearFill
-          className="text-blue-700 group-hover:scale-110 transition-transform duration-300"
-          size={24}
-        />
-      )}
-    </button>
+        `}
+      >
+        {isDarkMode ? (
+          <FaSun
+            className="text-yellow-200"
+            // size={24}
+          />
+        ) : (
+          <FaMoon
+            className="text-gray-600 "
+            // size={24}
+          />
+        )}
+        Toggle Theme{" "}
+      </button>
+    </>
   );
 };
 

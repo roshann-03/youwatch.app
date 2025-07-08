@@ -52,7 +52,9 @@ const VideoDetail = () => {
   // Toggle like
   const toggleLike = async (videoId) => {
     try {
-      const response = await axiosJSON.post(`likes/toggle/v/${videoId}`);
+      const response = await axiosJSON.post(`likes/toggle/v/${videoId}`, {
+        userId: video.owner._id,
+      });
       fetchVideoLikes();
       if (response?.data?.data === null) {
         setIsLiked(false);
@@ -249,7 +251,7 @@ const VideoDetail = () => {
           )}
         </div>
 
-        <CommentSection />
+        <CommentSection owner={video.owner} />
       </div>
 
       <h1 className="text-2xl font-bold text-left border-t-2 border-gray-300 dark:border-cyan-600 p-5 w-full max-w-6xl dark:text-cyan-300 tracking-wide">

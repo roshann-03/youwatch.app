@@ -3,10 +3,12 @@ import { Like } from "../models/like.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import notifyUser from "../utils/notifyUser.js";
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
   try {
     const { videoId } = req.params;
+    const { userId } = req.body;
     //TODO: toggle like on video
     if (!videoId) {
       return res.status(400).json(new ApiError(400, "Video ID is required"));
@@ -30,6 +32,15 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
         video: videoId,
         likedBy: req.user._id,
       });
+      if (userId.toString() !== req.user._id.toString()) {
+        await notifyUser(
+          userId,
+          "like",
+          `${req.user.username} liked your video`,
+          `${videoId}`
+        );
+      }
+
       return res.status(200).json(new ApiResponse(200, liked, "Video liked"));
     } else {
       await Like.findOneAndDelete({
@@ -91,14 +102,15 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
   const { tweetId } = req.params;
+  const { userId } = req.body;
   //TODO: toggle like on tweet
   try {
     //TODO: toggle like on video
     if (!tweetId) {
-      return res.status(400).json(new ApiError(400, "Video ID is required"));
+      return res.status(400).json(new ApiError(400, "tweet ID is required"));
     }
     if (!mongoose.Types.ObjectId.isValid(tweetId)) {
-      return res.status(400).json(new ApiError(400, "Invalid Video ID"));
+      return res.status(400).json(new ApiError(400, "Invalid tweet ID"));
     }
 
     if (!req.user || !req.user._id) {
@@ -116,6 +128,14 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
         tweet: tweetId,
         likedBy: req.user._id,
       });
+      if (userId !== req.user?._id) {
+        await notifyUser(
+          userId,
+          "like",
+          `/channel/${req.user?.username} liked your video!`,
+          `/video/${videoId}`
+        );
+      }
       return res.status(200).json(new ApiResponse(200, liked, "Tweet liked"));
     } else {
       await Like.findOneAndDelete({

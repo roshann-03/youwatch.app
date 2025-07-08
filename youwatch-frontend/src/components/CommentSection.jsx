@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { BiLike, BiSolidLike } from "react-icons/bi";
 import { axiosJSON } from "../api/axiosInstances";
 
-const CommentSection = () => {
+const CommentSection = ({ owner }) => {
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [page, setPage] = useState(1);
@@ -37,6 +37,7 @@ const CommentSection = () => {
       const response = await axiosJSON.get(
         `/comments/${id}?page=${currentPage}`
       );
+
       const newComments = response.data.data.docs.sort(
         () => Math.random() - 0.5
       );
@@ -58,6 +59,7 @@ const CommentSection = () => {
     e.preventDefault();
     try {
       const response = await axiosJSON.post(`/comments/${id}`, {
+        userId: owner._id,
         content: comment,
       });
       setComments((prev) => [

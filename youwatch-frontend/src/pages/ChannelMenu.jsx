@@ -75,7 +75,7 @@ const ChannelMenu = () => {
               className="w-32 h-32 rounded-full border-4 border-white dark:border-cyan-400 shadow-lg"
             />
             <div className="flex-1 space-y-2 text-center sm:text-left">
-              <h2 className="text-4xl font-bold tracking-wide text-gray-800 dark:text-white dark:font-futuristic">
+              <h2 className="sm:text-4xl  font-bold tracking-wide text-gray-800 dark:text-white dark:font-futuristic break-words">
                 @{channel.username}
                 <span className="ml-3 text-xl text-gray-600 dark:text-cyan-400">
                   • {subscriberCount} subscriber{subscriberCount !== 1 && "s"}

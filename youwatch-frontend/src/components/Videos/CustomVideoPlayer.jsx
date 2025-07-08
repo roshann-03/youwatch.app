@@ -125,6 +125,9 @@ export default function CustomVideoPlayer({ video }) {
     let lastTime = 0;
 
     const trackTime = () => {
+      if (viewed.current) {
+        return;
+      }
       if (Math.abs(vid.currentTime - lastTime) < 1.2) {
         watchedSeconds += 1;
       }

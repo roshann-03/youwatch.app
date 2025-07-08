@@ -39,6 +39,7 @@ const UploadVideo = () => {
       setDescription("");
       setVideoFile(null);
       setThumbnail(null);
+      setIsPublished(true);
     } catch (error) {
       notify("Failed to upload video");
       console.error("Upload error:", error);
@@ -249,6 +250,18 @@ const UploadVideo = () => {
                   setThumbnail(file);
                 }
               }}
+            />
+          </div>
+
+          <div className="mb-4 flex items-center">
+            <label className="text-sm font-semibold text-gray-700 dark:text-cyan-100 mr-3">
+              Publish
+            </label>
+            <input
+              type="checkbox"
+              checked={isPublished}
+              onChange={(e) => setIsPublished(e.target.checked)}
+              className="h-5 w-5 accent-blue-600 dark:accent-cyan-400"
             />
           </div>
 

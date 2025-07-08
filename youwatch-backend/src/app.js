@@ -60,7 +60,7 @@ import likeRouter from "./routes/like.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
 import OTPRouter from "./routes/otp.routes.js";
 import searchRouter from "./routes/search.routes.js";
-
+import notificatoinRouter from "./routes/notification.routes.js";
 //routes declaration
 //use routes
 app.use("/api/v1/healthcheck", healthcheckRouter);
@@ -73,7 +73,7 @@ app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/otp", OTPRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/search", searchRouter);
-
+app.use("/api/v1/notifications", notificatoinRouter);
 // Global error handler middleware
 app.use((err, req, res, next) => {
   // Check if error is an instance of ApiError

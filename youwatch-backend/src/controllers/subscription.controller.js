@@ -4,10 +4,11 @@ import { Subscription } from "../models/subscription.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-
+import notifyUser from "../utils/notifyUser.js";
 const toggleSubscription = asyncHandler(async (req, res) => {
   try {
     const { channelId } = req.params;
+
     // TODO: toggle subscription
 
     if (!channelId) {
@@ -34,6 +35,15 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         subscriber: req.user._id,
         channel: channelId,
       });
+
+      if (channelId.toString() !== req.user?._id.toString()) {
+        await notifyUser(
+          channelId,
+          "subscribe",
+          `${req.user?.username} subscribed to you!`,
+          `${req.user.username}`
+        );
+      }
       return res
         .status(201)
         .json(

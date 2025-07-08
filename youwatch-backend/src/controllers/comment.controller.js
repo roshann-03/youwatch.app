@@ -3,6 +3,7 @@ import { Comment } from "../models/comment.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import notifyUser from "../utils/notifyUser.js";
 
 const getVideoComments = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
@@ -69,9 +70,15 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
   // TODO: add a comment to a video
+
+  function shortContent(str) {
+    let newStr = str.slice(0, 15);
+    newStr += "...";
+    return newStr;
+  }
   try {
     const { videoId } = req.params;
-    const { content } = req.body;
+    const { userId, content } = req.body;
     if (!videoId || !mongoose.Types.ObjectId.isValid(videoId)) {
       return res.status(400).json(new ApiError(400, "Video ID is required"));
     }
@@ -90,6 +97,14 @@ const addComment = asyncHandler(async (req, res) => {
     });
     if (!comment) {
       return res.status(500).json(new ApiError(500, "Cannot add comment"));
+    }
+    if (userId.toString() !== req.user?._id.toString()) {
+      await notifyUser(
+        userId,
+        "comment",
+        `${req.user?.username} comment on your video! ${shortContent(content)}`,
+        `${videoId}`
+      );
     }
     return res
       .status(201)
