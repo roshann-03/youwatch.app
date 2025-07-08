@@ -1,6 +1,6 @@
 {
   "name": "youwatch-backend",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "description": "A backend of youwatch application",
   "type": "module",
   "main": "index.js",
