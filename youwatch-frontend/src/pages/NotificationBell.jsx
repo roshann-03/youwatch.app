@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaBell } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { axiosJSON } from "@/api/axiosInstances";
@@ -9,20 +9,30 @@ const NotificationBell = ({ currentUser }) => {
   const [notifications, setNotifications] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isUnread, setIsUnread] = useState(false);
+  const bellRef = useRef(null);
 
-  // Register socket and receive real-time notifications
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (bellRef.current && !bellRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Register socket
   useEffect(() => {
     if (!currentUser?._id) return;
-    socket.emit("register", currentUser?._id);
 
+    socket.emit("register", currentUser._id);
     socket.on("new-notification", (newNotif) => {
       setNotifications((prev) => [newNotif, ...prev]);
       setIsUnread(true);
     });
 
-    return () => {
-      socket.off("new-notification");
-    };
+    return () => socket.off("new-notification");
   }, [currentUser]);
 
   useEffect(() => {
@@ -38,9 +48,8 @@ const NotificationBell = ({ currentUser }) => {
 
       setNotifications((prev) => {
         const combined = [...serverNotifs, ...prev];
-
-        // Prevent duplicates (by _id or message fallback)
         const seen = new Set();
+
         return combined.filter((n) => {
           const id = n._id || n.message;
           if (seen.has(id)) return false;
@@ -49,7 +58,7 @@ const NotificationBell = ({ currentUser }) => {
         });
       });
 
-      setIsUnread(res.data.data?.some((n) => !n.isRead));
+      setIsUnread(serverNotifs.some((n) => !n.isRead));
     } catch (err) {
       console.error("Error fetching notifications:", err);
     }
@@ -65,7 +74,7 @@ const NotificationBell = ({ currentUser }) => {
       );
       fetchNotifications();
     } catch (error) {
-      console.log(error);
+      console.error("Error marking as read:", error);
     }
   };
 
@@ -74,7 +83,7 @@ const NotificationBell = ({ currentUser }) => {
   };
 
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block" ref={bellRef}>
       <button
         onClick={toggleDropdown}
         className="relative focus:outline-none"
@@ -96,7 +105,7 @@ const NotificationBell = ({ currentUser }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto rounded-2xl border border-[#e5e5e5] dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] shadow-2xl z-50"
+            className="absolute -right-16 sm:right-0 mt-2 w-[90vw] sm:w-80 max-h-[70vh] overflow-y-auto rounded-2xl border border-[#e5e5e5] dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] shadow-2xl z-50"
           >
             <div className="p-4 font-futuristic text-base text-[#1a1a1a] dark:text-[#eaeaea] border-b border-[#e5e5e5] dark:border-[#1a1a1a]">
               Notifications
@@ -109,38 +118,36 @@ const NotificationBell = ({ currentUser }) => {
               ) : (
                 notifications.map((n) => (
                   <div
-                    className="flex flex-wrap justify-start items-center p-2 gap-2"
+                    className="flex flex-col items-start p-3 gap-1"
                     key={n._id}
                   >
                     <Link
-                      className={`block font-exo text-sm transition ${
+                      to={`/channel/${n.message.split(" ")[0]}`}
+                      onClick={() => markAsRead(n._id)}
+                      className={`font-exo text-sm transition ${
                         !n.isRead
                           ? "text-blue-700 dark:text-[#ff00ff]"
                           : "text-[#1a1a1a] dark:text-[#eaeaea]"
                       } hover:bg-[#f5f5f5] dark:hover:bg-[#1a1a1a]`}
-                      to={`/channel/${n.message.split(" ")[0]}`}
-                      onClick={() => markAsRead(n._id)}
                     >
                       @{n.message.split(" ")[0] || "#"}
                     </Link>
+
                     <Link
                       to={
-                        `${
-                          n.type === "like" || n.type === "comment"
-                            ? "/video/"
-                            : "/channel/"
-                        }${n.link}` || "#"
+                        (n.type === "like" || n.type === "comment"
+                          ? "/video/"
+                          : "/channel/") + n.link
                       }
-                      key={n._id || n.message}
-                      className={`block font-exo text-sm transition ${
+                      onClick={() => markAsRead(n._id)}
+                      className={`font-exo text-sm transition ${
                         !n.isRead
                           ? "font-semibold text-[#2666b4] dark:text-[#c0afff]"
                           : "text-[#1a1a1a] dark:text-[#eaeaea]"
                       } hover:bg-[#f5f5f5] dark:hover:bg-[#1a1a1a]`}
-                      onClick={() => markAsRead(n._id)}
                     >
                       {n.message.split("!")[0].split(" ").slice(1).join(" ")}
-                      <span className="text-slate-500 font-normal text-lg">
+                      <span className="text-slate-500 font-normal text-sm block mt-1">
                         {(() => {
                           const msg = n.message.split("!")[1];
                           return msg ? `"${msg}"` : "";
