@@ -1,31 +1,5 @@
-import { axiosJSON } from "../../api/axiosInstances";
-import { useAuth } from "../../ContextAPI/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-
-const DeleteModal = ({ isOpen, onClose, onConfirm, videoTitle, videoId }) => {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-
+const DeleteModal = ({ isOpen, onClose, onConfirm, videoTitle }) => {
   if (!isOpen) return null;
-
-  const handleDelete = async () => {
-    try {
-      const response = await axiosJSON.delete(`/videos/${videoId}`);
-
-      if (response.status === 200) {
-        toast.success("Video deleted successfully");
-        if (onConfirm) onConfirm(); // let parent react
-        logout();
-        navigate("/login");
-      } else {
-        toast.error(response.data?.message || "Failed to delete");
-      }
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      toast.error("Something went wrong while deleting");
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-60 dark:bg-opacity-80 px-4">
@@ -60,7 +34,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, videoTitle, videoId }) => {
           </button>
 
           <button
-            onClick={handleDelete}
+            onClick={onConfirm}
             className="px-6 py-3 text-lg font-semibold rounded-lg transition-all
               bg-red-600 text-white hover:bg-red-700
               dark:bg-gradient-to-r dark:from-pink-600 dark:to-red-600

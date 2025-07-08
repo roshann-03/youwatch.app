@@ -6,6 +6,7 @@ import GoogleLoginButton from "../../components/Auth/GoogleLoginButton";
 import { axiosJSON } from "../../api/axiosInstances";
 import { useAuth } from "../../ContextAPI/AuthContext";
 import CustomToast from "@/components/custom/CustomToast";
+import refreshToken from "@/utils/refreshToken";
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -47,6 +48,7 @@ const Login = ({ onLogin }) => {
       localStorage.setItem("user", JSON.stringify(user));
       toast.success("Welcome back, Commander 🤖");
       login();
+      refreshToken();
       onLogin();
       navigate("/");
     } catch (error) {

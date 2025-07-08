@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { axiosJSON } from "../../api/axiosInstances";
 import DeleteModal from "../Modals/DeleteModal";
+import CustomToast from "../custom/CustomToast";
 
 const VideoCard = ({ video, isOptions = false }) => {
   const navigate = useNavigate();
@@ -59,6 +60,9 @@ const VideoCard = ({ video, isOptions = false }) => {
     try {
       await axiosJSON.delete(`/videos/${videoToDelete._id}`);
       notify("Video deleted successfully");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error deleting video", error);
@@ -273,6 +277,8 @@ const VideoCard = ({ video, isOptions = false }) => {
         videoTitle={videoToDelete ? videoToDelete.title : ""}
         videoId={video?._id}
       />
+
+      <CustomToast />
     </div>
   );
 };

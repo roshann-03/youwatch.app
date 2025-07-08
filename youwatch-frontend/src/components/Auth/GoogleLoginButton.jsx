@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { axiosJSON } from "../../api/axiosInstances"; // Import your axios instance
 import { useAuth } from "../../ContextAPI/AuthContext";
+import refreshToken from "@/utils/refreshToken";
 
 const GoogleLoginButton = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const GoogleLoginButton = () => {
         toast.success("Successfully logged in with Google!");
         if (user?.hasPassword) {
           login();
+          refreshToken();
           navigate("/", { replace: true });
         } else {
           navigate("/set-password", { replace: true });

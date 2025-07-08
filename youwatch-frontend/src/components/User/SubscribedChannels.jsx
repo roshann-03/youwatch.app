@@ -53,7 +53,7 @@ const SubscribedChannels = () => {
         </p>
 
         {/* Channel List */}
-        <div className="bg-slate-800 sm:p-6 rounded-2xl shadow-xl border dark:border-[#00ffff33] backdrop-blur-xl  w-full overflow-x-auto">
+        <div className="bg-slate-800 sm:p-6 rounded-2xl shadow-xl border dark:border-[#00ffff33] backdrop-blur-xl  w-full overflow-x-auto p-3">
           {subscribedCount === 0 ? (
             <p className="text-center dark:text-gray-300 text-gray-500">
               No subscribed channels found.
@@ -68,7 +68,7 @@ const SubscribedChannels = () => {
                   <li
                     key={channel._id}
                     onClick={() => navigate(`/channel/${channel.username}`)}
-                    className="cursor-pointer p-4 rounded-xl transition-all border dark:border-cyan-500 border-gray-300 hover:scale-[1.02] hover:shadow-lg dark:hover:shadow-cyan-500/50 hover:bg-gray-100 dark:hover:bg-[#0e0e2e] bg-white dark:bg-[#111122]"
+                    className="cursor-pointer p-4 rounded-xl transition-all border dark:border-cyan-500 border-gray-300 hover:scale-[1.02] hover:shadow-lg dark:hover:shadow-cyan-500/50 hover:bg-gray-100 dark:hover:bg-[#0e0e2e] bg-white dark:bg-[#111122] "
                   >
                     <div className="flex items-center gap-6 flex-wrap break-words">
                       <img

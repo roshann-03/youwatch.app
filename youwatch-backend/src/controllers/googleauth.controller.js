@@ -53,12 +53,10 @@ export const googleAuthController = asyncHandler(async (req, res) => {
     } else {
       hasPassword = true;
     }
-    // console.log(user);
     // Generate access and refresh tokens
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
       user._id
     );
-    console.log(user.avatar);
 
     // Send tokens as HTTP-only cookies
     const options = {
