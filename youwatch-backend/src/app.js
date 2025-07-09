@@ -10,17 +10,18 @@ import { rateLimit } from "express-rate-limit";
 
 const app = express();
 
-const limiter = rateLimit({
-  windowsMs: 60 * 1000,
-  max: 1000,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    status: 429,
-    message: "Too many requests, please try again after a minute.",
-  },
-});
-app.use(limiter);
+app.use(
+  rateLimit({
+    windowsMs: 60 * 1000,
+    limit: 20000,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+      status: 429,
+      message: "Too many requests, please try again after a minute.",
+    },
+  })
+);
 
 app.use(morgan("dev"));
 app.set("trust proxy", 1);
